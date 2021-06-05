@@ -1,0 +1,14 @@
+module vol2com.Views
+AboutView 1.0 AboutView.qml
+EqualizerView 1.0 EqualizerView.qml
+MainView 1.0 MainView.qml
+Settings 1.0 Settings.qml
+ConnectView 1.0 Connect\ConnectView.qml
+SerialDelegate 1.0 Connect\SerialDelegate.qml
+ChristmasMode 1.0 WorkMode\ChristmasMode.qml
+FadeMode 1.0 WorkMode\FadeMode.qml
+GeneralMode 1.0 WorkMode\GeneralMode.qml
+ManualMode 1.0 WorkMode\ManualMode.qml
+RandomMode 1.0 WorkMode\RandomMode.qml
+WorkModeSelector 1.0 WorkMode\WorkModeSelector.qml
+WorkModeView 1.0 WorkMode\WorkModeView.qml

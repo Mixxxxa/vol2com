@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" version="1.1" viewBox="0 0 33.87 33.87" xmlns="http://www.w3.org/2000/svg">
+ <g transform="translate(0 -263.1)">
+  <g transform="translate(259.3 -92.57)">
+   <g transform="translate(104.6 55.98)">
+    <circle cx="-347" cy="316.7" r="15.88" fill="#90ee90"/>
+    <g transform="translate(-363.9 36.59)" fill="#00008b">
+     <rect x="7.408" y="274.8" width="2.117" height="10.58" rx="1.058"/>
+     <rect x="11.64" y="276.9" width="2.117" height="6.35" rx="1.058"/>
+     <rect x="24.34" y="275.3" width="2.117" height="9.525" rx="1.058"/>
+     <rect x="15.88" y="273.2" width="2.117" height="13.76" rx="1.058"/>
+     <rect x="20.11" y="270.5" width="2.117" height="19.05" rx="1.058"/>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

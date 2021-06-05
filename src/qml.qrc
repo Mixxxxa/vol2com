@@ -1,0 +1,43 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>res/icon-active.ico</file>
+        <file>res/icon-unactive.ico</file>
+        <file>res/icon-active.svg</file>
+        <file>res/icon-unactive.svg</file>
+        <file>res/modes/gaming.svg</file>
+        <file>res/modes/general.svg</file>
+        <file>res/modes/manual.svg</file>
+        <file>res/modes/fireplace.svg</file>
+        <file>res/modes/party.svg</file>
+        <file>res/modes/fade.svg</file>
+        <file>res/modes/christmas.svg</file>
+        <file>qml/vol2com/Views/Connect/ConnectView.qml</file>
+        <file>qml/vol2com/Views/Connect/SerialDelegate.qml</file>
+        <file>qml/vol2com/Views/WorkMode/ChristmasMode.qml</file>
+        <file>qml/vol2com/Views/WorkMode/FadeMode.qml</file>
+        <file>qml/vol2com/Views/WorkMode/GeneralMode.qml</file>
+        <file>qml/vol2com/Views/WorkMode/ManualMode.qml</file>
+        <file>qml/vol2com/Views/WorkMode/WorkModeSelector.qml</file>
+        <file>qml/vol2com/Views/WorkMode/WorkModeView.qml</file>
+        <file>qml/vol2com/Views/AboutView.qml</file>
+        <file>qml/vol2com/Views/EqualizerView.qml</file>
+        <file>qml/vol2com/Views/MainView.qml</file>
+        <file>qml/vol2com/Views/qmldir</file>
+        <file>qml/vol2com/Views/Settings.qml</file>
+        <file>qml/vol2com/ColorButton.qml</file>
+        <file>qml/vol2com/GradientSlider.qml</file>
+        <file>qml/vol2com/Header.qml</file>
+        <file>qml/vol2com/TitleBarButton.qml</file>
+        <file>qml/vol2com/ListDelegate.qml</file>
+        <file>qml/vol2com/qmldir</file>
+        <file>qml/vol2com/TitleBar.qml</file>
+        <file>qml/vol2com/VerticalToolBar.qml</file>
+        <file>qml/vol2com/StandartButton.qml</file>
+        <file>qml/vol2com/Views/WorkMode/RandomMode.qml</file>
+        <file>res/modes/random.svg</file>
+        <file>qml/vol2com/StandartView.qml</file>
+        <file>qml/vol2com/Popups/qmldir</file>
+        <file>qml/vol2com/Popups/EpilepsyWarningPopup.qml</file>
+    </qresource>
+</RCC>

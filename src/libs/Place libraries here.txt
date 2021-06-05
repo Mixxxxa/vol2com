@@ -1,0 +1,3 @@
+bass
+bass_wasapi
+WinToast

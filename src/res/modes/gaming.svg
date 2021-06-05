@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" enable-background="new 0 0 24 24" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+ <rect width="24" height="24" fill="#e5140f" fill-opacity=".9412"/>
+ <g transform="translate(2.6e-6 .3595)" fill="#fff">
+  <g fill="#fff">
+   <path d="m21.58 16.09-1.09-7.66c-0.28-1.97-1.97-3.43-3.96-3.43h-9.06c-1.99 0-3.68 1.46-3.96 3.43l-1.09 7.66c-0.22 1.54 0.97 2.91 2.52 2.91 0.68 0 1.32-0.27 1.8-0.75l2.26-2.25h6l2.25 2.25c0.48 0.48 1.13 0.75 1.8 0.75 1.56 0 2.75-1.37 2.53-2.91zm-10.58-5.09h-2v2h-1v-2h-2v-1h2v-2h1v2h2zm4-1c-0.55 0-1-0.45-1-1s0.45-1 1-1 1 0.45 1 1-0.45 1-1 1zm2 3c-0.55 0-1-0.45-1-1s0.45-1 1-1 1 0.45 1 1-0.45 1-1 1z" fill="#fff"/>
+  </g>
+ </g>
+</svg>
