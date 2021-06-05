@@ -1,9 +1,12 @@
 # vol2com
 Simple open source LED strip management software.
 The main advantage of the program is the ability to control the color depended on the music being played. Also, the advantages of the program include support for various types of connections, a large number of operating modes (with the settings for each of them), the presence of an equalizer for fine-tuning the values and a lot of other useful functions.
-![ConnectionPage](assets/Connection.png)
-![OperatingModesPage](assets/ModeSelector.png)
-![EqualizerPage](assets/Equalizer.png)
+
+<p align="middle">
+  <img src="assets/Connection.png" alt="ConnectionPage" width="33%"/>
+  <img src="assets/ModeSelector.png" alt="OperatingModesPage" width="33%"/>
+  <img src="assets/Equalizer.png" alt="EqualizerPage" width="33%"/>
+</p>
 
 - [Features](#features)
 - [Operating modes](#modes)
@@ -20,13 +23,13 @@ The main advantage of the program is the ability to control the color depended o
 
 <a name="modes"></a>
 ## Operating modes
-1. General - Analyses sound and send color corresponding color.
-![GeneralMode](assets/General.png)
-2. Fade - Blinks selected color to the beat of the music.
-![FadeMode](assets/Fade.png)
-4. Random - Smoothly changes current color in random direction.
-5. Manual - Sends selected color. HSV color selector available and a few predefined colors.
-![ManualMode](assets/Manual.png)
+| Name | Description | Screenshot |
+| ------------- |:-------------:| -----:|
+| General | Analyses sound and send color corresponding color | <img src="assets/General.png" width="300"> |
+| Fade | Blinks selected color to the beat of the music | <img src="assets/Fade.png" width="300"> |
+| Random | Smoothly changes current color in random direction | Nothing to see here) |
+| Manual | Sends selected color. HSV color selector available and a few predefined colors | <img src="assets/Manual.png" width="300"> |
+
 You can suggest new operating modes via [issues](https://github.com/Mixxxxa/vol2com/issues).
 
 <a name="build"></a>
