@@ -42,7 +42,7 @@ AbstractBandViewer::AbstractBandViewer(QQuickItem* parent) :
 {
     setFlag(ItemHasContents);
     setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton);
-    setRenderTarget(QQuickPaintedItem::InvertedYFramebufferObject);
+    //setRenderTarget(QQuickPaintedItem::InvertedYFramebufferObject);
 
     const auto& style = AppStyle::getInstance();
     applyStyles(style.theme());

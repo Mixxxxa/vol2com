@@ -19,26 +19,21 @@
 **
 ****************************************************************************/
 
-import QtQuick.Controls 2.15
-import QtQuick.Controls.Universal 2.12
-import QtQuick.Window 2.15
-import vol2com 1.0
-import vol2com.Views 1.0
+import QtQuick
+import QtQuick.Controls
+import vol2com 1.0 as VC
 
-ApplicationWindow {
-    id: mainWindow
-    visible: true
-    width: 652
-    height: 480
-    title: "vol2com"
-    flags: Qt.Window | Qt.FramelessWindowHint
-    Universal.theme: AppStyle.theme
-    Universal.background: AppStyle.background
-    Universal.foreground: AppStyle.foreground
-    Universal.accent: AppStyle.accent
-
-    MainView {
-        id: mainView
-        anchors.fill: parent
+Button {
+    id: control
+    property color hoveredColor: VC.AppStyle.accent
+    flat: true
+    background: Rectangle {
+        visible: control.hovered || control.down
+        color: control.hoveredColor
+        opacity: control.down ? 0.85 : 1.0
+    }
+    font {
+        family: "Segoe MDL2 Assets"
+        pixelSize: 13
     }
 }

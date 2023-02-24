@@ -22,12 +22,14 @@
 #define ABOUTPAGEVIEWMODEL_H
 
 #include <QObject>
+#include <QtQml/qqmlregistration.h>
 
 namespace vol2com
 {
     class AboutPageViewModel : public QObject
     {
         Q_OBJECT
+        QML_ELEMENT
         Q_PROPERTY(QString aboutText READ aboutText CONSTANT)
         Q_PROPERTY(QString copyrightText READ copyrightText CONSTANT)
         Q_PROPERTY(QString versionText READ versionText CONSTANT)

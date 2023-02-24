@@ -46,23 +46,27 @@ EqualizerViewer::EqualizerViewer(QQuickItem* parent) :
 
     const auto& style = AppStyle::getInstance();
     applyStyles(style.theme());
+    //applyStyles(AppStyle::Theme::Dark);
 }
 
 void EqualizerViewer::paint(QPainter* painter)
 {
     AbstractBandViewer::paint(painter);
     const int ItemHeight = height() - BarsPadding * 2;
+    const auto startY = height() - BarsPadding;
     const auto& EqData = m_eq->all();
     const bool OverAllActive = m_eq->overallAmplificationActive();
 
     for(size_t i = 0; i < m_data.size(); ++i)
     {
         if(m_data[i] == 0)
-            return;
+        {
+          return;
+        }
 
         const auto& rect = m_rects[i];
         const int HeightBase = remap<int>(m_data[i], 0, 255, 0 , ItemHeight);
-        painter->fillRect(rect.x(), BarsPadding, rect.width(), HeightBase, m_normalBrush);
+        painter->fillRect(rect.x(), startY, rect.width(), -HeightBase, m_normalBrush);
 
         if(m_eqEnabled && (OverAllActive || EqData[i] != Equalizer::DefaultValue))
         {
@@ -71,14 +75,14 @@ void EqualizerViewer::paint(QPainter* painter)
 
             if(HeightDiff > 0)
             {
-                painter->fillRect(rect.x(), BarsPadding + HeightBase,
-                                  rect.width(), HeightDiff,
+                painter->fillRect(rect.x(), startY - HeightBase,
+                                  rect.width(), -HeightDiff,
                                   m_positiveBrush);
             }
             else if (HeightDiff < 0)
             {
-                painter->fillRect(rect.x(), BarsPadding + HeightBase,
-                                  rect.width(), HeightDiff,
+                painter->fillRect(rect.x(), startY - HeightBase,
+                                  rect.width(), -HeightDiff,
                                   m_negativeBrush);
             }
         }

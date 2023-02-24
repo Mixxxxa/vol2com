@@ -19,16 +19,20 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Window 2.15
-import vol2com 1.0
-import vol2com.Popups 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Window
+import vol2com as VC
+//import vol2com.Popups 1.0
 
 Rectangle {
     id: mainView
     anchors.fill: parent
-    color: AppStyle.background
+    color: VC.AppStyle.background
+
+    VC.ToolbarViewModel {
+        id: viewModel
+    }
 
     VerticalToolBar {
         id: toolbar
@@ -58,18 +62,18 @@ Rectangle {
 
         function getSource(page){
             switch(page){
-            case Controller.ConnectPage:
-                return "qrc:/qml/vol2com/Views/Connect/ConnectView.qml";
-            case Controller.WorkModePage:
-                return "qrc:/qml/vol2com/Views/WorkMode/WorkModeView.qml";
-            case Controller.EqualizerPage:
-                return "qrc:/qml/vol2com/Views/EqualizerView.qml";
-            case Controller.SettingsPage:
-                return "qrc:/qml/vol2com/Views/Settings.qml";
-            case Controller.AboutPage:
-                return "qrc:/qml/vol2com/Views/AboutView.qml";
+            case VC.Controller.ConnectPage:
+                return "qrc:/vol2com/qml/ConnectView.qml";
+            case VC.Controller.WorkModePage:
+                return "qrc:/vol2com/qml/WorkModeView.qml";
+            case VC.Controller.EqualizerPage:
+                return "qrc:/vol2com/qml/EqualizerView.qml";
+            case VC.Controller.SettingsPage:
+                return "qrc:/vol2com/qml/Settings.qml";
+            case VC.Controller.AboutPage:
+                return "qrc:/vol2com/qml/AboutView.qml";
             default:
-                return "qrc:/Views/Settings.qml";
+                return "qrc:/vol2com/qml/Settings.qml";
             }
         }
 
@@ -80,7 +84,7 @@ Rectangle {
             left: toolbar.right
             right: parent.right
         }
-        source: getSource(Controller.page)
+        source: getSource(VC.Controller.page)
     }
 
     Rectangle {
@@ -88,26 +92,26 @@ Rectangle {
         anchors.fill: parent
         border {
             width: 1
-            color: AppStyle.accent
+            color: VC.AppStyle.accent
         }
         visible: mainWindow.visibility === Window.Windowed
     }
 
-    Component.onCompleted: {
-        if(Settings.photosensitiveWarningAccepted === false)
-        {
-            let comp = Qt.createComponent("qrc:/qml/vol2com/Popups/EpilepsyWarningPopup.qml");
-            if (comp && comp.status === Component.Ready) {
-                let warning = comp.createObject(mainView);
-                if (warning) {
-                    warning.rejected.connect(function(){
-                        Controller.exit();
-                    });
-                    warning.open()
-                }
-            }
-        }
-    }
+//    Component.onCompleted: {
+//        if(Settings.photosensitiveWarningAccepted === false)
+//        {
+//            let comp = Qt.createComponent("qrc:/qml/vol2com/Popups/EpilepsyWarningPopup.qml");
+//            if (comp && comp.status === Component.Ready) {
+//                let warning = comp.createObject(mainView);
+//                if (warning) {
+//                    warning.rejected.connect(function(){
+//                        Controller.exit();
+//                    });
+//                    warning.open()
+//                }
+//            }
+//        }
+//    }
 
     //Connections {
     //    target: Controller

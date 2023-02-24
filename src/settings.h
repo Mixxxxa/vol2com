@@ -26,12 +26,18 @@
 #include <QSettings>
 #include <QVariant>
 #include <QMetaEnum>
+#include <QtQml/qqmlregistration.h>
+
+class QQmlEngine;
+class QJSEngine;
 
 namespace vol2com
 {
     class Settings : public QObject
     {
         Q_OBJECT
+        QML_ELEMENT
+        QML_SINGLETON
 
         Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
         Q_PROPERTY(bool autostart READ autostart WRITE setAutostart NOTIFY autostartChanged)
@@ -49,6 +55,8 @@ namespace vol2com
             PhotosensitiveWarningAccepted
         };
         Q_ENUM(Keys)
+
+        static Settings *create(QQmlEngine *, QJSEngine *engine);
 
         template <class Section=QString, class Key>
         QVariant get(const Section& section, const Key& key, const QVariant& defaultValue)

@@ -24,12 +24,14 @@
 
 #include <QObject>
 #include "equalizer.h"
+#include <QtQml/qqmlregistration.h>
 
 namespace vol2com
 {
     class EqualizerViewModel : public QObject
     {
         Q_OBJECT
+        QML_ELEMENT
         Q_PROPERTY(vol2com::Equalizer::EqualizerValue defaultValue READ defaultValue CONSTANT)
         Q_PROPERTY(vol2com::Equalizer::EqualizerValue minValue READ minValue CONSTANT)
         Q_PROPERTY(vol2com::Equalizer::EqualizerValue maxValue READ maxValue CONSTANT)

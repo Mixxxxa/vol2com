@@ -22,29 +22,57 @@
 **
 ****************************************************************************/
 
+//#include <QGuiApplication>
+
+//#include "controller.h"
+//#include "settings.h"
+//#include "v2c.h"
+//#include "translator.h"
+
 #include <QGuiApplication>
 #include <QQuickStyle>
+#include <QQmlApplicationEngine>
 #include "controller.h"
-#include "settings.h"
-#include "v2c.h"
-#include "translator.h"
+
+#include <QLocale>
+#include <QTranslator>
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setApplicationName(V2C_APP_NAME);
-    QCoreApplication::setApplicationVersion(V2C_APP_VERSION_STR);
-    QQuickStyle::setStyle(QLatin1String("Universal"));
+  QQuickStyle::setStyle(QLatin1String("Universal"));
+  QGuiApplication app(argc, argv);
 
-    QGuiApplication app(argc, argv);
-    app.setQuitOnLastWindowClosed(false);
+  QTranslator translator;
+  const QStringList uiLanguages = QLocale::system().uiLanguages();
+  for (const QString &locale : uiLanguages) {
+    const QString baseName = "vol2com_" + QLocale(locale).name();
+    if (translator.load(":/i18n/" + baseName)) {
+      app.installTranslator(&translator);
+      break;
+    }
+  }
 
-    vol2com::Translator translator;
-    translator.loadTranslation();
+  auto& controller = vol2com::Controller::getInstance();
+  controller.openUI();
 
-    auto& controller = vol2com::Controller::getInstance();
-    controller.init();
-    controller.openUI();
 
-    return app.exec();
+
+  return app.exec();
+
+  ////QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+  //QCoreApplication::setApplicationName(V2C_APP_NAME);
+  //QCoreApplication::setApplicationVersion(V2C_APP_VERSION_STR);
+  //QQuickStyle::setStyle(QLatin1String("Universal"));
+
+  //QGuiApplication app(argc, argv);
+  ////app.setQuitOnLastWindowClosed(false);
+
+  //vol2com::Translator translator;
+  //translator.loadTranslation();
+
+  //auto& controller = vol2com::Controller::getInstance();
+  //controller.init();
+  //controller.openUI();
+
+  //return app.exec();
 }

@@ -19,12 +19,13 @@
 **
 ****************************************************************************/
 
-#ifndef BASSLIBWRAPPER_H
-#define BASSLIBWRAPPER_H
+#pragma once
 
 #include <QObject>
 #include <array>
 #include <memory>
+
+//#define NOMINMAX
 #include <Windows.h>
 
 namespace vol2com
@@ -99,5 +100,3 @@ namespace vol2com
 }
 
 Q_DECLARE_METATYPE(DWORD)
-
-#endif // BASSLIBWRAPPER_H

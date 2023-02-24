@@ -24,6 +24,7 @@
 
 #include <QObject>
 #include "basslibwrapper.h"
+#include <QtQml/qqmlregistration.h>
 
 namespace vol2com
 {
@@ -35,6 +36,7 @@ namespace vol2com
     class WorkModeViewModel : public QObject
     {
         Q_OBJECT
+        QML_ELEMENT
         Q_PROPERTY(vol2com::WorkModesModel* modes READ modes CONSTANT)
         Q_PROPERTY(vol2com::BasicQMLModel* devices READ devices CONSTANT)
         Q_PROPERTY(vol2com::WorkModeBase* currentMode READ currentMode NOTIFY currentModeChanged)

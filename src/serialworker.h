@@ -19,21 +19,30 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import vol2com 1.0
+#pragma once
 
-Button {
-    id: control
-    property color hoveredColor: AppStyle.accent
-    flat: true
-    background: Rectangle {
-        visible: control.hovered || control.down
-        color: control.hoveredColor
-        opacity: control.down ? 0.85 : 1.0
-    }
-    font {
-        family: "Segoe MDL2 Assets"
-        pixelSize: 13
-    }
+#include <QSerialPort>
+
+namespace vol2com
+{
+  class SerialWorker : public QSerialPort
+  {
+    Q_OBJECT
+
+  public:
+    SerialWorker(const QString &port, QObject *parent = nullptr);
+    ~SerialWorker();
+
+    void openPort();
+    void closePort();
+    void reconnect();
+
+  public slots:
+    void formatAndSend(const QByteArray& data);
+
+  signals:
+    void connectionSuccess();
+    void connectionFailed();
+    void connectionClosed();
+  };
 }

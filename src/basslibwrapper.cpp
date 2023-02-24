@@ -23,8 +23,9 @@
 ****************************************************************************/
 
 #include "basslibwrapper.h"
-#include "./libs/bass/c/bass.h"
-#include "./libs/bass_wasapi/c/basswasapi.h"
+#include <bass.h>
+#include <basswasapi.h>
+
 #include "datamodels/basicqmlmodel.h"
 #include "controller.h"
 #include <stdexcept>

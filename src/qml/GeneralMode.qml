@@ -79,7 +79,7 @@ StandartView {
         onRightMouseClicked: {
             contextMenu.popup(pos)
         }
-        onSelectedBandChanged: {
+        onSelectedBandChanged: function(selectedBand){
             viewModel.currentMode.selectedBand.value = selectedBand
         }
 

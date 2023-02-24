@@ -48,7 +48,7 @@ namespace
     {
         return QLatin1String("<a href=\"%1/commit/%2\">%2</a>")
                 .arg(GitHubProjectUrl)
-                .arg(GIT_COMMIT);
+                .arg("#FIXME");
     }
 
     QString getCompilerInfo()
@@ -87,7 +87,7 @@ QString AboutPageViewModel::versionText() const
 QString AboutPageViewModel::commitText() const
 {
     return tr("Build based on commit: %1 [%2]")
-            .arg(getCommitLink(), QLatin1String(GIT_BRANCH));
+      .arg(getCommitLink(), QLatin1String("#FIXME"));
 }
 
 QString AboutPageViewModel::qtInfoText() const

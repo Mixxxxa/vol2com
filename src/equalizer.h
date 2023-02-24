@@ -25,12 +25,15 @@
 #include "v2cbase.h"
 #include "basslibwrapper.h"
 #include <array>
+#include <QtQml/qqmlregistration.h>
 
 namespace vol2com
 {
     class Equalizer : public V2CBase
     {
         Q_OBJECT
+        QML_ELEMENT
+        QML_UNCREATABLE("")
 
     public:
         typedef unsigned int EqualizerValue;

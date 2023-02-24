@@ -19,46 +19,42 @@
 **
 ****************************************************************************/
 
-#ifndef WORKMODEBASE_H
-#define WORKMODEBASE_H
+#pragma once
 
 #include "v2cbase.h"
-
-class QTimer;
+#include <QtQml/qqmlregistration.h>
 
 namespace vol2com
 {
-    class WorkModeBase : public V2CBase
+  class WorkModeBase : public V2CBase
+  {
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("")
+
+    Q_PROPERTY(QString name READ name CONSTANT)
+    Q_PROPERTY(QString qmlDelegate READ qmlDelegate CONSTANT)
+
+  public:
+    static QString qmlDelegatesPath()
     {
-        Q_OBJECT
+      return QStringLiteral("qrc:/vol2com/qml/");
+    }
 
-        Q_PROPERTY(QString name READ name CONSTANT)
-        Q_PROPERTY(QString qmlDelegate READ qmlDelegate CONSTANT)
+    explicit WorkModeBase(QObject* parent = nullptr):
+      V2CBase(parent)
+    { }
+    virtual ~WorkModeBase() = default;
 
-    public:
-        static QString qmlDelegatesPath()
-        {
-            return QStringLiteral("qrc:/qml/vol2com/Views/WorkMode/");
-        }
+    virtual QString name() const = 0;
+    virtual QString qmlDelegate() const = 0;
 
-        explicit WorkModeBase(QObject* parent = nullptr):
-            V2CBase(parent)
-        { }
-        virtual ~WorkModeBase() = default;
+  public slots:
+    virtual void start() = 0;
+    virtual void stop() = 0;
+    virtual void process() = 0;
 
-        virtual QString name() const = 0;
-        virtual QString qmlDelegate() const = 0;
-
-    public slots:
-        virtual void start() = 0;
-        virtual void stop() = 0;
-        virtual void process() = 0;
-
-    signals:
-        void dataReady(const QByteArray& data);
-    };
+  signals:
+    void dataReady(const QByteArray& data);
+  };
 }
-
-Q_DECLARE_METATYPE(vol2com::WorkModeBase*)
-
-#endif // WORKMODEBASE_H

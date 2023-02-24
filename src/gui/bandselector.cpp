@@ -50,12 +50,15 @@ void BandSelector::paint(QPainter* painter)
 {
     AbstractBandViewer::paint(painter);
     const int ItemHeight = height() - BarsPadding * 2;
+    const auto startY = height() - BarsPadding;
     QColor color;
 
     for(size_t i = 0; i < m_data.size(); ++i)
     {
         if(m_data[i] == 0)
-            return;
+        {
+          return;
+        }
 
         const auto& rect = m_rects[i];
         const int height = remap<int>(m_eq->processValue(static_cast<int>(i), m_data[i]), 0, 255, 0 , ItemHeight);
@@ -64,11 +67,11 @@ void BandSelector::paint(QPainter* painter)
         {
             color = m_colorFunc(m_eq->processValue(static_cast<int>(i), m_data[i]));
             m_activeBandBrush.setColor(color);
-            painter->fillRect(rect.x(), BarsPadding, rect.width(), height, m_activeBandBrush);
+            painter->fillRect(rect.x(), startY, rect.width(), -height, m_activeBandBrush);
         }
         else
         {
-            painter->fillRect(rect.x(), BarsPadding, rect.width(), height, m_unactiveBandBrush);
+            painter->fillRect(rect.x(), startY, rect.width(), -height, m_unactiveBandBrush);
         }
     }
 }

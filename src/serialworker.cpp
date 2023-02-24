@@ -22,55 +22,69 @@
 **
 ****************************************************************************/
 
-#include "serialport.h"
+#include "serialworker.h"
 
-using namespace vol2com;
-
-SerialPort::SerialPort(const QString& port, QObject* parent) :
-    QSerialPort(port, parent)
+namespace vol2com
 {
-}
+  SerialWorker::SerialWorker(const QString &port, QObject *parent)
+    : QSerialPort(port, parent)
+  {
+  }
 
-SerialPort::~SerialPort()
-{
+  SerialWorker::~SerialWorker()
+  {
     if(isOpen())
-        close();
-}
+    {
+      close();
+    }
+  }
 
-void SerialPort::openPort()
-{
+  void SerialWorker::openPort()
+  {
     if(this->open(QIODevice::ReadWrite))
-        emit connectionSuccess();
+    {
+      emit connectionSuccess();
+    }
     else
-        emit connectionFailed();
-}
+    {
+      emit connectionFailed();
+    }
+  }
 
-void SerialPort::closePort()
-{
+  void SerialWorker::closePort()
+  {
     if(isOpen())
-        close();
+    {
+      close();
+    }
     emit connectionClosed();
-}
+  }
 
-void SerialPort::reconnect()
-{
+  void SerialWorker::reconnect()
+  {
     if(isOpen())
-        close();
+    {
+      close();
+    }
 
     bool check = false;
     for(size_t i = 0; !check && (i < 3); ++i)
     {
-        check = this->open(QIODevice::ReadWrite);
+      check = this->open(QIODevice::ReadWrite);
     }
 
     if(check)
-        emit connectionSuccess();
+    {
+      emit connectionSuccess();
+    }
     else
-        emit connectionFailed();
-}
+    {
+      emit connectionFailed();
+    }
+  }
 
-void SerialPort::formatAndSend(const QByteArray &data)
-{
+  void SerialWorker::formatAndSend(const QByteArray &data)
+  {
     constexpr char DataSep = '-';
     constexpr char DataTail = '#';
 
@@ -78,4 +92,5 @@ void SerialPort::formatAndSend(const QByteArray &data)
     dataToSend.append(DataSep);
     dataToSend.append(DataTail);
     write(dataToSend);
+  }
 }

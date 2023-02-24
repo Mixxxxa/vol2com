@@ -24,8 +24,8 @@
 
 #include "toolbarviewmodel.h"
 
-using namespace vol2com;
-
+namespace vol2com
+{
 ToolbarViewModel::ToolbarViewModel(QObject *parent) :
     QObject(parent),
     m_showStatus(false),
@@ -81,3 +81,6 @@ void ToolbarViewModel::onModeChanged(std::shared_ptr<WorkModeBase> mode)
     m_workMode = mode;
     updateBackArrow();
 }
+}
+
+

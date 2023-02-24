@@ -69,11 +69,11 @@ StandartView {
         enabled: viewModel.availableForEdit
         ComboBox {
             model: [
-                { name: "9600",   value: QSerialPort.Baud9600 },
-                { name: "19200",  value: QSerialPort.Baud19200 },
-                { name: "38400",  value: QSerialPort.Baud38400 },
-                { name: qsTr("57600 (recommended)"), value: QSerialPort.Baud57600 },
-                { name: "115200", value: QSerialPort.Baud115200 }
+                { name: "9600",                      value: SerialConnector.Baud9600   },
+                { name: "19200",                     value: SerialConnector.Baud19200  },
+                { name: "38400",                     value: SerialConnector.Baud38400  },
+                { name: qsTr("57600 (recommended)"), value: SerialConnector.Baud57600  },
+                { name: "115200",                    value: SerialConnector.Baud115200 }
             ]
             textRole: "name"
             valueRole: "value"
@@ -109,10 +109,10 @@ StandartView {
         }
         ComboBox {
             model: [
-                { name: "5", value: QSerialPort.Data5 },
-                { name: "6", value: QSerialPort.Data6 },
-                { name: "7", value: QSerialPort.Data7 },
-                { name: "8", value: QSerialPort.Data8 }
+                { name: "5", value: SerialConnector.Data5 },
+                { name: "6", value: SerialConnector.Data6 },
+                { name: "7", value: SerialConnector.Data7 },
+                { name: "8", value: SerialConnector.Data8 }
             ]
             textRole: "name"
             valueRole: "value"
@@ -124,11 +124,11 @@ StandartView {
         }
         ComboBox {
             model: [
-                { name: "No",    value: QSerialPort.NoParity },
-                { name: "Even",  value: QSerialPort.EvenParity },
-                { name: "Odd",   value: QSerialPort.OddParity },
-                { name: "Space", value: QSerialPort.SpaceParity },
-                { name: "Mark",  value: QSerialPort.MarkParity }
+                { name: "No",    value: SerialConnector.NoParity },
+                { name: "Even",  value: SerialConnector.EvenParity },
+                { name: "Odd",   value: SerialConnector.OddParity },
+                { name: "Space", value: SerialConnector.SpaceParity },
+                { name: "Mark",  value: SerialConnector.MarkParity }
             ]
             textRole: "name"
             valueRole: "value"
@@ -140,9 +140,9 @@ StandartView {
         }
         ComboBox {
             model: [
-                { name: "1",   value: QSerialPort.OneStop },
-                { name: "1.5", value: QSerialPort.OneAndHalfStop },
-                { name: "2",   value: QSerialPort.TwoStop }
+                { name: "1",   value: SerialConnector.OneStop },
+                { name: "1.5", value: SerialConnector.OneAndHalfStop },
+                { name: "2",   value: SerialConnector.TwoStop }
             ]
             textRole: "name"
             valueRole: "value"
@@ -180,19 +180,19 @@ StandartView {
         states: [
             State {
                 name: "idle"
-                when: viewModel.state === Serial.Idle
+                when: viewModel.state === SerialConnector.Idle
                 PropertyChanges {
                     target:processButton
                     text: qsTr("Connect")
                     enabled: true
                     onClicked: {
-                        viewModel.connectDevice()
+                        viewModel.requestConnect()
                     }
                 }
             },
             State {
                 name: "connecting"
-                when: viewModel.state === Serial.Connecting
+                when: viewModel.state === SerialConnector.Connecting
                 PropertyChanges {
                     target: processButton
                     text: qsTr("Connecting...")
@@ -202,19 +202,19 @@ StandartView {
             },
             State {
                 name: "connected"
-                when: viewModel.state === Serial.Connected
+                when: viewModel.state === SerialConnector.Connected
                 PropertyChanges {
                     target: processButton
                     text: qsTr("Disconnect")
                     enabled: true
                     onClicked: {
-                        viewModel.disconnectDevice()
+                        viewModel.requestDisconnect()
                     }
                 }
             },
             State {
                 name: "reconnecting"
-                when: viewModel.state === Serial.Reconnecting
+                when: viewModel.state === SerialConnector.Reconnecting
                 PropertyChanges {
                     target: processButton
                     text: qsTr("Trying to reconnect")

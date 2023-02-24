@@ -25,6 +25,7 @@
 #include "abstractbandviewer.h"
 #include "basslibwrapper.h"
 #include <QBrush>
+#include <QtQml/qqmlregistration.h>
 
 namespace vol2com
 {
@@ -33,6 +34,7 @@ namespace vol2com
     class EqualizerViewer : public AbstractBandViewer
     {
         Q_OBJECT
+        QML_ELEMENT
 
     public:
         EqualizerViewer(QQuickItem* parent = nullptr);

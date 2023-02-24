@@ -19,10 +19,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.14
-import vol2com 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import vol2com as VC
 
 Rectangle {
     id: toolbar
@@ -32,9 +32,9 @@ Rectangle {
     signal backClicked
 
     width: 50
-    color: AppStyle.theme === AppStyle.Dark ? "#1f1f1f" : "#e6e6e6"
+    color: VC.AppStyle.theme === VC.AppStyle.Dark ? "#1f1f1f" : "#e6e6e6"
 
-    ToolbarViewModel {
+    VC.ToolbarViewModel {
         id: viewModel
     }
 
@@ -45,13 +45,13 @@ Rectangle {
         TitleBarButton {
             id: mainButton
             text: viewModel.backarrowActive? "\uE72B" : ""
-            hoveredColor: AppStyle.accentDark1
+            hoveredColor: VC.AppStyle.accentDark1
             enabled: viewModel.backarrowActive
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: 40
             ToolTip.text: qsTr("Change mode")
             ToolTip.visible: hovered
-            ToolTip.delay: AppStyle.tooltipDelay
+            ToolTip.delay: VC.AppStyle.tooltipDelay
             onClicked: {
                 backClicked()
             }
@@ -60,7 +60,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 6
                 visible: !viewModel.backarrowActive
-                source: "qrc:/res/icon-active.svg"
+                source: "qrc:/vol2com/res/icon-active.svg"
                 sourceSize.width: height
                 sourceSize.height: height
                 verticalAlignment: Image.AlignVCenter
@@ -76,9 +76,9 @@ Rectangle {
             Layout.preferredHeight: parent.width
             ToolTip.text: qsTr("Connection")
             ToolTip.visible: hovered
-            ToolTip.delay: AppStyle.tooltipDelay
+            ToolTip.delay: VC.AppStyle.tooltipDelay
             onClicked: {
-                Controller.page = Controller.ConnectPage
+                VC.Controller.page = VC.Controller.ConnectPage
             }
         }
 
@@ -89,9 +89,9 @@ Rectangle {
             Layout.preferredHeight: parent.width
             ToolTip.text: qsTr("Modes")
             ToolTip.visible: hovered
-            ToolTip.delay: AppStyle.tooltipDelay
+            ToolTip.delay: VC.AppStyle.tooltipDelay
             onClicked: {
-                Controller.page = Controller.WorkModePage
+                VC.Controller.page = VC.Controller.WorkModePage
             }
         }
 
@@ -102,9 +102,9 @@ Rectangle {
             Layout.preferredHeight: parent.width
             ToolTip.text: qsTr("Equalizer")
             ToolTip.visible: hovered
-            ToolTip.delay: AppStyle.tooltipDelay
+            ToolTip.delay: VC.AppStyle.tooltipDelay
             onClicked: {
-                Controller.page = Controller.EqualizerPage
+                VC.Controller.page = VC.Controller.EqualizerPage
             }
         }
 
@@ -119,9 +119,9 @@ Rectangle {
             Layout.preferredHeight: parent.width
             ToolTip.text: qsTr("Settings")
             ToolTip.visible: hovered
-            ToolTip.delay: AppStyle.tooltipDelay
+            ToolTip.delay: VC.AppStyle.tooltipDelay
             onClicked: {
-                Controller.page = Controller.SettingsPage
+                VC.Controller.page = VC.Controller.SettingsPage
             }
         }
 
@@ -132,16 +132,16 @@ Rectangle {
             Layout.preferredHeight: parent.width
             ToolTip.text: qsTr("About")
             ToolTip.visible: hovered
-            ToolTip.delay: AppStyle.tooltipDelay
+            ToolTip.delay: VC.AppStyle.tooltipDelay
             onClicked: {
-                Controller.page = Controller.AboutPage
+                VC.Controller.page = VC.Controller.AboutPage
             }
         }
     }
 
     Rectangle {
         id: pageIndicator
-        color: AppStyle.accent
+        color: VC.AppStyle.accent
         width: 3
         height: 50 - toolbar.indicatorMargin * 2
         radius: 1
@@ -153,35 +153,35 @@ Rectangle {
 
     states: [
         State {
-            when: viewModel.page === Controller.ConnectPage
+            when: viewModel.page === VC.Controller.ConnectPage
             PropertyChanges {
                 target: pageIndicator;
                 y: connectButton.y + toolbar.indicatorMargin
             }
         },
         State {
-            when: viewModel.page === Controller.WorkModePage
+            when: viewModel.page === VC.Controller.WorkModePage
             PropertyChanges {
                 target: pageIndicator;
                 y: workModeButton.y + toolbar.indicatorMargin
             }
         },
         State {
-            when: viewModel.page === Controller.EqualizerPage
+            when: viewModel.page === VC.Controller.EqualizerPage
             PropertyChanges {
                 target: pageIndicator;
                 y: equalizerButton.y + toolbar.indicatorMargin
             }
         },
         State {
-            when: viewModel.page === Controller.SettingsPage
+            when: viewModel.page === VC.Controller.SettingsPage
             PropertyChanges {
                 target: pageIndicator;
                 y: settingsButton.y + toolbar.indicatorMargin
             }
         },
         State {
-            when: viewModel.page === Controller.AboutPage
+            when: viewModel.page === VC.Controller.AboutPage
             PropertyChanges {
                 target: pageIndicator;
                 y: aboutButton.y + toolbar.indicatorMargin

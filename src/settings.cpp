@@ -25,6 +25,7 @@
 #include "settings.h"
 #include <QCoreApplication>
 #include <array>
+#include <QJSEngine>
 
 using namespace vol2com;
 
@@ -49,6 +50,13 @@ Settings::Settings(QObject *parent) :
     m_photosensitiveWarningAccepted(false)
 {
     load();
+}
+
+Settings *Settings::create(QQmlEngine *, QJSEngine *engine)
+{
+  Settings *result = &(Settings::getInstance());
+  QJSEngine::setObjectOwnership(result, QJSEngine::ObjectOwnership::CppOwnership);
+  return result;
 }
 
 Settings& Settings::getInstance()

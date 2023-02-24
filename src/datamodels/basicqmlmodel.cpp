@@ -24,68 +24,79 @@
 
 #include "basicqmlmodel.h"
 
-using namespace vol2com;
-
-BasicQMLModel::BasicQMLModel(QObject* parent)
+namespace vol2com
+{
+  BasicQMLModel::BasicQMLModel(QObject* parent)
     : QAbstractListModel(parent)
-{
-}
+  {
+  }
 
-int BasicQMLModel::rowCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent)
+  int BasicQMLModel::rowCount(const QModelIndex&) const
+  {
     return static_cast<int>(m_data.size());
-}
+  }
 
-QVariant BasicQMLModel::data(const QModelIndex& index, int role) const
-{
-    if (index.row() < 0 || index.row() >= static_cast<int>(m_data.size()))
-        return QVariant();
-
-    const auto &item = m_data[index.row()];
-    switch(role)
+  QVariant BasicQMLModel::data(const QModelIndex& index, int role) const
+  {
+    const auto row = index.row();
+    if(index.isValid()
+       && row >= 0
+       && static_cast<container_type::size_type>(row) < m_data.size())
     {
-    case TextRole:
-        return item.text;
-    case ValueRole:
-        return item.value;
-    case ImageRole:
-        return item.image;
-    default:
-        return QVariant();
+      const auto &rowData = m_data[static_cast<container_type::size_type>(row)];
+      switch(role)
+      {
+        case Roles::TextRole:  return rowData.text;
+        case Roles::ValueRole: return rowData.value;
+        case Roles::ImageRole: return rowData.image;
+      }
     }
-}
+    return {};
+  }
 
-int BasicQMLModel::findIndex(const QVariant& value) const
-{
+  int BasicQMLModel::findIndex(const QVariant& value) const
+  {
     for(size_t i = 0; i < m_data.size(); ++i)
     {
-        if(m_data[i].value == value)
-            return static_cast<int>(i);
+      if(m_data[i].value == value)
+        return static_cast<int>(i);
     }
 
     return -1;
-}
+  }
 
-void BasicQMLModel::add(QVariant&& text, QVariant&& value, QVariant&& image)
-{
+  void BasicQMLModel::add(QVariant&& text, QVariant&& value, QVariant&& image)
+  {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    m_data.emplace_back(text, value, image);
+    m_data.emplace_back(value_type
+                        {
+                          .text = text,
+                          .value = value,
+                          .image = image
+                        });
     endInsertRows();
-}
+  }
 
-void BasicQMLModel::clear()
-{
+  void BasicQMLModel::clear()
+  {
     beginResetModel();
     m_data.clear();
     endResetModel();
-}
+  }
 
-QHash<int, QByteArray> BasicQMLModel::roleNames() const
-{
+  void BasicQMLModel::SetData(container_type newData)
+  {
+    beginResetModel();
+    m_data = std::move(newData);
+    endResetModel();
+  }
+
+  QHash<int, QByteArray> BasicQMLModel::roleNames() const
+  {
     QHash<int, QByteArray> roles;
     roles[TextRole] = "text";
     roles[ValueRole] = "value";
     roles[ImageRole] = "image";
     return roles;
+  }
 }

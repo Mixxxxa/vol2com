@@ -19,22 +19,23 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.15
-import QtQuick.Layouts 1.14
-import vol2com 1.0
+import QtQuick
+import QtQuick.Layouts
+import vol2com as VC
 
 Rectangle {
     id: viewTitle
     readonly property int windowControlWidth: 58
     height: 40
-    color: AppStyle.accentDark1
+    color: VC.AppStyle.accentDark1
 
     MouseArea {
         property point clickPos: Qt.point(1,1)
-        onPressed: {
+
+        onPressed: function(mouse) {
             clickPos = Qt.point(mouse.x,mouse.y)
         }
-        onPositionChanged: {
+        onPositionChanged: function(mouse) {
             mainWindow.x = mainWindow.x + mouse.x - clickPos.x
             mainWindow.y = mainWindow.y + mouse.y - clickPos.y
         }
@@ -44,7 +45,7 @@ Rectangle {
     RowLayout {
         spacing: 0
         anchors.fill: parent
-        anchors.leftMargin: AppStyle.pageMargins
+        anchors.leftMargin: VC.AppStyle.pageMargins
 
         Text {
             text: Qt.application.name
@@ -71,7 +72,7 @@ Rectangle {
             hoveredColor: "red"
             Layout.preferredWidth: viewTitle.windowControlWidth
             Layout.preferredHeight: viewTitle.height
-            onClicked: Controller.exit()
+            onClicked: VC.Controller.exit()
         }
     }
 }

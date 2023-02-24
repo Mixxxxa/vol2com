@@ -99,11 +99,11 @@ Page {
         Component.onCompleted: {
             if(viewModel.currentMode !== null)
             {
-                push([Qt.resolvedUrl("qrc:/qml/vol2com/Views/WorkMode/WorkModeSelector.qml"), Qt.resolvedUrl(viewModel.currentMode.qmlDelegate)])
+                push([Qt.resolvedUrl("qrc:/vol2com/qml/WorkModeSelector.qml"), Qt.resolvedUrl(viewModel.currentMode.qmlDelegate)])
             }
             else
             {
-                push(Qt.resolvedUrl("qrc:/qml/vol2com/Views/WorkMode/WorkModeSelector.qml"))
+                push(Qt.resolvedUrl("qrc:/vol2com/qml/WorkModeSelector.qml"))
             }
         }
         onBusyChanged: {

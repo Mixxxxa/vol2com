@@ -19,33 +19,28 @@
 **
 ****************************************************************************/
 
-#ifndef SERIALPORT_H
-#define SERIALPORT_H
+import QtQuick
+//import QtQuick.Layouts
+import QtQuick.Controls
+import QtQuick.Controls.Universal
+//import QtQuick.Window
+import vol2com
+//import vol2com.Views 1.0
 
-#include <QSerialPort>
+Window {
+    id: mainWindow
+    width: 652
+    height: 480
+    visible: true
+    title: "vol2com"
+    flags: Qt.Window | Qt.FramelessWindowHint
+    Universal.theme: AppStyle.theme
+    Universal.background: AppStyle.background
+    Universal.foreground: AppStyle.foreground
+    Universal.accent: AppStyle.accent
 
-namespace vol2com
-{
-    class SerialPort : public QSerialPort
-    {
-        Q_OBJECT
-
-    public:
-        SerialPort(const QString& port, QObject* parent = nullptr);
-        virtual ~SerialPort();
-
-        void openPort();
-        void closePort();
-        void reconnect();
-
-    public slots:
-        void formatAndSend(const QByteArray& data);
-
-    signals:
-        void connectionSuccess();
-        void connectionFailed();
-        void connectionClosed();
-    };
+    MainView {
+        id: mainView
+        anchors.fill: parent
+    }
 }
-
-#endif // SERIALPORT_H

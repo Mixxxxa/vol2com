@@ -26,16 +26,17 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickWindow>
+#include <QJSEngine>
 
 #include "settings.h"
-#include "serial.h"
+#include "serialconnector.h"
 #include "basslibwrapper.h"
 #include "equalizer.h"
-#include "guihelper.h"
-#include "appstyle.h"
-#include "systemevents.h"
+//#include "guihelper.h"
+//#include "appstyle.h"
+//#include "systemevents.h"
 
-#include "datamodels/basicqmlmodel.h"
+//#include "datamodels/basicqmlmodel.h"
 #include "workmodesfactory.h"
 
 #include "workmodes/workmodebase.h"
@@ -48,265 +49,295 @@
 #include <QDebug>
 
 using namespace vol2com;
+using namespace Qt::Literals::StringLiterals;
 
-Controller::Controller() :
-    V2CBase(nullptr),
-    m_connectType(ConnectType::Serial),
-    m_page(Page::WorkModePage),
-    m_mainWindow(nullptr),
-    m_connector(nullptr),
-    m_bassLib(nullptr),
-    m_equalizer(nullptr),
-    m_factory(nullptr),
-    m_mode(nullptr),
-    m_engine(nullptr),
-    m_systemEvents(nullptr)
+Controller::Controller(QObject *parent)
+  : V2CBase     { parent }
+  , m_connector { std::make_shared<SerialConnector>() }
+  , m_bassLib   { std::make_shared<BassLibWrapper>() }
+  , m_equalizer { std::make_shared<Equalizer>() }
+  , m_factory   { std::make_shared<WorkModesFactory>() }
 {
+  m_factory->add<GeneralMode>(u"General"_s,     tr("General"),   tr("All color spectre available"), u"qrc:/vol2com/res/modes/general.svg"_s);
+  m_factory->add<FadeMode>(u"Fade"_s,           tr("Fade"),      tr("Fading of selected color"),    u"qrc:/vol2com/res/modes/fade.svg"_s);
+  m_factory->add<RandomMode>(u"Random"_s,       tr("Random"),    tr("Randomly changing colors"),    u"qrc:/vol2com/res/modes/random.svg"_s);
+  m_factory->add<ManualMode>(u"Manual"_s,       tr("Manual"),    tr("Select any color"),            u"qrc:/vol2com/res/modes/manual.svg"_s);
+  m_factory->add<ChristmasMode>(u"Christmas"_s, tr("Christmas"), tr("Imitation of christmas leds"), u"qrc:/vol2com/res/modes/christmas.svg"_s);
+
+  QObject::connect(connector().get(), &ConnectMethodBase::stateChanged,
+                                this, &Controller::onConnectionStateChanged);
+  QObject::connect(qGuiApp, &QGuiApplication::aboutToQuit,
+                      this, &Controller::deInit);
+  QObject::connect(connector().get(), &ConnectMethodBase::connectionFailed,
+    [this](const QString& message)
+    {
+      if(isMainWindowOpened())
+      {
+        showMessage(tr("Connection failed"), message);
+      }
+      //else
+      //    m_systemEvents->sendConnectionFailedToast(message);
+    });
+  QObject::connect(bassLib().get(), &BassLibWrapper::showNotification,
+    [this](const QString& title, const QString& message)
+    {
+      if(isMainWindowOpened())
+      {
+        showMessage(title, message);
+      }
+      //else
+      //    m_systemEvents->sendDeviceChangedToast(title, message);
+    });
 }
 
 Controller::~Controller()
 {
-    deInit();
+  deInit();
 }
 
 bool Controller::isMainWindowOpened() const
 {
-    return (m_mainWindow && m_mainWindow->isActive());
+  return (m_mainWindow && m_mainWindow->isActive());
+}
+
+Controller *Controller::create(QQmlEngine *, QJSEngine *engine)
+{
+  Controller *result = &(Controller::getInstance());
+  QJSEngine::setObjectOwnership(result, QJSEngine::ObjectOwnership::CppOwnership);
+  return result;
 }
 
 Controller& Controller::getInstance()
 {
-    static Controller instance;
-    return instance;
-}
-
-void Controller::init()
-{
-    GUIHelper::registerMetaTypes();
-    m_connector = std::make_shared<Serial>();
-    m_bassLib = std::make_shared<BassLibWrapper>();
-    m_factory = std::make_shared<WorkModesFactory>();
-    m_equalizer = std::make_shared<Equalizer>();
-    m_systemEvents = std::make_unique<SystemEvents>();
-
-    m_factory->add<GeneralMode>("General", tr("General"), tr("All color spectre available"), "qrc:/res/modes/general.svg");
-    m_factory->add<FadeMode>("Fade", tr("Fade"), tr("Fading of selected color"), "qrc:/res/modes/fade.svg");
-    m_factory->add<RandomMode>("Random", tr("Random"), tr("Randomly changing colors"), "qrc:/res/modes/random.svg");
-    m_factory->add<ManualMode>("Manual", tr("Manual"), tr("Select any color"), "qrc:/res/modes/manual.svg");
-    m_factory->add<ChristmasMode>("Christmas", tr("Christmas"), tr("Imitation of christmas leds"), "qrc:/res/modes/christmas.svg");
-    //m_factory->add<GeneralMode>("Party", tr("Party"), tr("Blue + Purple"), "qrc:/res/modes/party.svg");
-    //m_factory->add<GeneralMode>("Gaming", tr("Gaming"), tr("Red accents"), "qrc:/res/modes/gaming.svg");
-    //m_factory->add<GeneralMode>("Fireplace", tr("Fireplace"), tr("Fireplace imitation"), "qrc:/res/modes/fireplace.svg");
-
-    QObject::connect(connector().get(), &ConnectMethodBase::stateChanged,
-                     this, &Controller::onConnectionStateChanged);
-    QObject::connect(qGuiApp, &QGuiApplication::aboutToQuit,
-                     this, &Controller::deInit);
-    QObject::connect(connector().get(), &ConnectMethodBase::connectionFailed, [this](const QString& message)
-    {
-        if(isMainWindowOpened())
-            showMessage(tr("Connection failed"), message);
-        else
-            m_systemEvents->sendConnectionFailedToast(message);
-    });
-    QObject::connect(bassLib().get(), &BassLibWrapper::showNotification, [this](const QString& title, const QString& message)
-    {
-        if(isMainWindowOpened())
-            showMessage(title, message);
-        else
-            m_systemEvents->sendDeviceChangedToast(title, message);
-    });
+  static Controller instance;
+  return instance;
 }
 
 void Controller::deInit()
 {
-    closeUI();
+  closeUI();
 
-    if(m_engine)
-        m_engine = nullptr;
-    if(m_mode)
-        m_mode = nullptr;
-    if(m_connector)
-        m_connector = nullptr;
-    if(m_equalizer)
-        m_equalizer = nullptr;
-    if(m_bassLib)
-        m_bassLib = nullptr;
-    if(m_factory)
-        m_factory = nullptr;
-    if(m_systemEvents)
-        m_systemEvents = nullptr;
+  if(m_engine)
+    m_engine = nullptr;
+  if(m_mode)
+    m_mode = nullptr;
+  if(m_connector)
+    m_connector = nullptr;
+  if(m_equalizer)
+    m_equalizer = nullptr;
+  if(m_bassLib)
+    m_bassLib = nullptr;
+  if(m_factory)
+    m_factory = nullptr;
+  //if(m_systemEvents)
+  //    m_systemEvents = nullptr;
 }
 
 void Controller::openUI()
 {
-    if(!m_engine)
-    {
-        m_engine = std::make_unique<QQmlApplicationEngine>();
-        m_engine->addImportPath("qrc:/qml/");
-        vol2com::GUIHelper::registerQMLTypes();
-        qmlRegisterSingletonInstance("vol2com", 1, 0, "Settings", &Settings::getInstance());
-        qmlRegisterSingletonInstance("vol2com", 1, 0, "Controller", this);
-        qmlRegisterSingletonInstance("vol2com", 1, 0, "AppStyle", &AppStyle::getInstance());
-        QObject::connect(&Settings::getInstance(), &Settings::languageChanged, [this]()
-        {
-            showMessage(tr("Language changed"),
-                        tr("Changes will come into effect when you restart the app"));
-        });
-    }
+  if(!m_engine)
+  {
+    //QQmlApplicationEngine engine;
+    m_engine = std::make_unique<QQmlApplicationEngine>();
+    //qmlRegisterSingletonInstance("vol2com", 1, 0, "Settings", &Settings::getInstance());
+    //qmlRegisterSingletonInstance("vol2com", 1, 0, "Controller", this);
+    //qmlRegisterSingletonInstance("vol2com", 1, 0, "AppStyle", &AppStyle::getInstance());
 
-    const QUrl url(QStringLiteral("qrc:/main.qml"));
+    const QUrl url(u"qrc:/vol2com/qml/main.qml"_qs);
     QObject::connect(m_engine.get(), &QQmlApplicationEngine::objectCreated,
                      qGuiApp, [url](QObject *obj, const QUrl &objUrl)
     {
         if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
+        {
+          QCoreApplication::exit(-1);
+        }
     }, Qt::QueuedConnection);
-
     m_engine->load(url);
-    m_mainWindow = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
-    if(m_mainWindow)
-    {
-        QObject::connect(m_mainWindow, &QQuickWindow::windowStateChanged,
-                         this, &Controller::windowStateChanged);
-    }
+
+
+    //m_engine = std::make_unique<QQmlApplicationEngine>();
+    //m_engine->addImportPath(u"qrc:/vol2com/qml/"_qs);
+    //vol2com::GUIHelper::registerQMLTypes();
+    //qmlRegisterSingletonInstance("vol2com", 1, 0, "Settings", &Settings::getInstance());
+    //qmlRegisterSingletonInstance("vol2com", 1, 0, "Controller", this);
+    //qmlRegisterSingletonInstance("vol2com", 1, 0, "AppStyle", &AppStyle::getInstance());
+    //QObject::connect(&Settings::getInstance(), &Settings::languageChanged, [this]()
+    //{
+    //    showMessage(tr("Language changed"),
+    //                tr("Changes will come into effect when you restart the app"));
+    //});
+  }
+
+
+  //const QUrl url(u"qrc:/vol2com/qml/main.qml"_qs);
+  //QObject::connect(m_engine.get(), &QQmlApplicationEngine::objectCreated,
+  //                 qGuiApp, [url](QObject *obj, const QUrl &objUrl)
+  //{
+  //  if (!obj && url == objUrl)
+  //  {
+  //    QCoreApplication::exit(-1);
+  //  }
+  //}, Qt::QueuedConnection);
+  //m_engine->load(url);
+  //const QUrl url(QStringLiteral("qrc:/vol2com/main.qml"));
+  //QObject::connect(m_engine.get(), &QQmlApplicationEngine::objectCreated,
+  //                 qGuiApp, [url](QObject *obj, const QUrl &objUrl)
+  //{
+  //    if (!obj && url == objUrl)
+  //        QCoreApplication::exit(-1);
+  //}, Qt::QueuedConnection);
+
+  //m_engine->load(url);
+  //if (m_engine->rootObjects().isEmpty())
+  //{
+  //    QCoreApplication::exit(-2);
+  //}
+
+  //m_mainWindow = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
+  //if(m_mainWindow)
+  //{
+  //    QObject::connect(m_mainWindow, &QQuickWindow::windowStateChanged,
+  //                     this, &Controller::windowStateChanged);
+  //}
 }
 
 void Controller::closeUI()
 {
-    if(!m_engine || m_engine->rootObjects().isEmpty())
-        return;
+  if(!m_engine || m_engine->rootObjects().isEmpty())
+    return;
 
-    if(m_mainWindow)
-    {
-        m_mainWindow->close();
-        m_mainWindow->releaseResources();
-        m_mainWindow->deleteLater();
-        m_mainWindow = nullptr;
-    }
+  if(m_mainWindow)
+  {
+    m_mainWindow->close();
+    m_mainWindow->releaseResources();
+    m_mainWindow->deleteLater();
+    m_mainWindow = nullptr;
+  }
 
-    if(m_engine)
-    {
-        m_engine->collectGarbage();
-        m_engine->clearComponentCache();
-        qGuiApp->processEvents();
-    }
+  if(m_engine)
+  {
+    m_engine->collectGarbage();
+    m_engine->clearComponentCache();
+    qGuiApp->processEvents();
+  }
 }
 
 void Controller::exit()
 {
-    Settings::getInstance().save();
-    qGuiApp->exit(0);
+  Settings::getInstance().save();
+  qGuiApp->exit(0);
 }
 
 void Controller::openGUIPage(const Controller::Page& page)
 {
-    setPage(page);
-    if(m_mainWindow)
-    {
-        if(m_mainWindow->visibility() == QWindow::Minimized)
-            m_mainWindow->showNormal();
-        if(!m_mainWindow->isActive())
-            m_mainWindow->requestActivate();
-    }
+  setPage(page);
+  if(m_mainWindow)
+  {
+    if(m_mainWindow->visibility() == QWindow::Minimized)
+      m_mainWindow->showNormal();
+    if(!m_mainWindow->isActive())
+      m_mainWindow->requestActivate();
+  }
 }
 
 void Controller::retryConnect()
 {
-    if(m_connector)
-        m_connector->reconnect();
+  if(m_connector)
+  {
+    m_connector->requestReconnect();
+  }
 }
 
-void Controller::setConnectType(Controller::ConnectType connectType)
+void Controller::setConnectType(ConnectType connectType)
 {
-    if(connectType == ConnectType::WebSocket)
-    {
-        emit showMessage("Websocket", tr("At the moment WebSocket is not implemented. Sorry."));
-        emit connectTypeChanged(ConnectType::Serial);
-        return;
-    }
+  if(connectType == ConnectType::WebSocket)
+  {
+    emit showMessage("Websocket", tr("At the moment WebSocket is not implemented. Sorry."));
+    emit connectTypeChanged(ConnectType::Serial);
+    return;
+  }
 
-    if (m_connectType == connectType)
-        return;
-    m_connectType = connectType;
-    emit connectTypeChanged(m_connectType);
+  if (m_connectType == connectType)
+    return;
+  m_connectType = connectType;
+  emit connectTypeChanged(m_connectType);
 }
 
 void Controller::setMode(const QString& modename)
 {
-    if(m_mode)
+  if(m_mode)
+  {
+    if(m_mode->name() == modename)
+      return;
+
+    m_mode->stop();
+    m_mode->disconnect();
+  }
+
+  m_mode = m_factory->create(modename);
+  if(m_mode != nullptr)
+  {
+    if(m_connector)
     {
-        if(m_mode->name() == modename)
-            return;
+      QObject::connect(m_mode.get(), &WorkModeBase::dataReady,
+                       m_connector.get(), &ConnectMethodBase::write);
 
-        m_mode->stop();
-        m_mode->disconnect();
+      if(m_connector->state() == ConnectMethodBase::State::Connected)
+        m_mode->start();
     }
+  }
+  else
+  {
+    m_bassLib->stop();
+  }
 
-    m_mode = m_factory->create(modename);
-    if(m_mode != nullptr)
-    {
-        if(m_connector)
-        {
-            QObject::connect(m_mode.get(), &WorkModeBase::dataReady,
-                             m_connector.get(), &ConnectMethodBase::write);
-
-            if(m_connector->state() == ConnectMethodBase::State::Connected)
-                m_mode->start();
-        }
-    }
-    else
-    {
-        m_bassLib->stop();
-    }
-
-    emit modeChanged(m_mode);
+  emit modeChanged(m_mode);
 }
 
 void Controller::clearMode()
 {
-    setMode("");
+  setMode("");
 }
 
 void Controller::onConnectionStateChanged(const ConnectMethodBase::State& state)
 {
-    switch (state) {
-    case ConnectMethodBase::State::Idle:
-        qDebug() << "Idle";
-        break;
-    case ConnectMethodBase::State::Connecting:
-        qDebug() << "Connecting";
-        break;
-    case ConnectMethodBase::State::Connected:
-        qDebug() << "Connected";
-        break;
-    case ConnectMethodBase::State::Reconnecting:
-        qDebug() << "Reconnecting";
-        break;
-    }
+  switch (state) {
+  case ConnectMethodBase::State::Idle:
+    qDebug() << "Idle";
+    break;
+  case ConnectMethodBase::State::Connecting:
+    qDebug() << "Connecting";
+    break;
+  case ConnectMethodBase::State::Connected:
+    qDebug() << "Connected";
+    break;
+  case ConnectMethodBase::State::Reconnecting:
+    qDebug() << "Reconnecting";
+    break;
+  }
 
-    switch(state){
-    case ConnectMethodBase::State::Connected:
-        qDebug() << "Start";
-        if(m_mode != nullptr)
-        {
-            //QObject::connect(m_mode.get(), &WorkModeBase::dataReady,
-            //                 m_connector.get(), &ConnectMethodBase::write, Qt::UniqueConnection);
-            m_mode->start();
-        }
-        break;
-    default:
-        qDebug() << "Stop";
-        if(m_mode)
-            m_mode->stop();
+  switch(state){
+  case ConnectMethodBase::State::Connected:
+    qDebug() << "Start";
+    if(m_mode != nullptr)
+    {
+      //QObject::connect(m_mode.get(), &WorkModeBase::dataReady,
+      //                 m_connector.get(), &ConnectMethodBase::write, Qt::UniqueConnection);
+      m_mode->start();
     }
+    break;
+  default:
+    qDebug() << "Stop";
+    if(m_mode)
+      m_mode->stop();
+  }
 }
 
-void Controller::setPage(Controller::Page page)
+void Controller::setPage(Page page)
 {
-    if (m_page == page)
-        return;
+  if (m_page == page)
+    return;
 
-    m_page = page;
-    emit pageChanged(m_page);
+  m_page = page;
+  emit pageChanged(m_page);
 }
