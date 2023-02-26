@@ -32,7 +32,8 @@ Rectangle {
     signal backClicked
 
     width: 50
-    color: VC.AppStyle.theme === VC.AppStyle.Dark ? "#1f1f1f" : "#e6e6e6"
+    color: VC.AppStyle.theme === VC.AppStyle.Dark ? "#1f1f1f"
+                                                  : "#e6e6e6"
 
     VC.ToolbarViewModel {
         id: viewModel
@@ -50,7 +51,7 @@ Rectangle {
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: 40
             ToolTip.text: qsTr("Change mode")
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered && viewModel.backarrowActive
             ToolTip.delay: VC.AppStyle.tooltipDelay
             onClicked: {
                 backClicked()

@@ -77,20 +77,20 @@ void AppStyle::repaint()
     //m_accentDark3 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentDark3));
     ////m_foreground = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::Foreground));
     ////m_background = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::Background));
-    //m_foreground = QColor(m_theme == Theme::Dark ? Qt::white : Qt::black);
-    //m_background = QColor(m_theme == Theme::Dark ? Qt::black : Qt::white);
+    m_foreground = QColor(m_theme == Theme::Dark ? Qt::white : Qt::black);
+    m_background = QColor(m_theme == Theme::Dark ? Qt::black : Qt::white);
     //m_grayText = WinRTColorToQColor(m_uiSettings.UIElementColor(UIElementType::GrayText));
     //
-    //emit accentChanged(m_accent);
-    //emit accentDark1Changed(m_accentDark1);
-    //emit accentDark2Changed(m_accentDark2);
-    //emit accentDark3Changed(m_accentDark3);
-    //emit accentLight1Changed(m_accentLight1);
-    //emit accentLight2Changed(m_accentLight2);
-    //emit accentLight3Changed(m_accentLight3);
-    //emit foregroundChanged(m_foreground);
-    //emit backgroundChanged(m_background);
-    //emit grayTextChanged(m_grayText);
+    emit accentChanged(m_accent);
+    emit accentDark1Changed(m_accentDark1);
+    emit accentDark2Changed(m_accentDark2);
+    emit accentDark3Changed(m_accentDark3);
+    emit accentLight1Changed(m_accentLight1);
+    emit accentLight2Changed(m_accentLight2);
+    emit accentLight3Changed(m_accentLight3);
+    emit foregroundChanged(m_foreground);
+    emit backgroundChanged(m_background);
+    emit grayTextChanged(m_grayText);
 }
 
 AppStyle::AppStyle(QObject *parent) :
@@ -116,8 +116,8 @@ AppStyle::AppStyle(QObject *parent) :
     m_iconFont.setPixelSize(18);
     //m_colorsChangeToken = m_uiSettings.ColorValuesChanged(winrt::auto_revoke, {this, &AppStyle::onWindowsColorsChanged});
 
-    //QObject::connect(this, &AppStyle::themeChanged,
-    //                 this, &AppStyle::repaint);
+    QObject::connect(this, &AppStyle::themeChanged,
+                     this, &AppStyle::repaint);
 
     //repaint();
 }

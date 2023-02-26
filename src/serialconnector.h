@@ -96,6 +96,7 @@ namespace vol2com
       , Databits
       , Parity
       , StopBits
+      , FlowControl
       , AutoReconnect
     };
     Q_ENUM(SettingsKeys)

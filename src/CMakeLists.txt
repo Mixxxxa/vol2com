@@ -2,6 +2,7 @@
 
 qt_add_executable(appvol2com
     main.cpp
+    resource.rc
 )
 
 set_target_properties(appvol2com PROPERTIES

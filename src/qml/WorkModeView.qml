@@ -28,7 +28,8 @@ Page {
     title: qsTr("Select mode")
     header: Header {
         id: pageHeader
-        title: viewModel.currentMode ? viewModel.currentMode.name : parent.title
+        title: viewModel.currentMode ? viewModel.currentMode.name
+                                     : parent.title
 
         ComboBox {
             model: viewModel.devices
@@ -72,7 +73,7 @@ Page {
     WorkModeViewModel {
         id: viewModel
         onCurrentModeChanged: {
-            if(viewModel.currentMode !== null){
+            if(viewModel.currentMode){
                 modeStack.push(Qt.resolvedUrl(viewModel.currentMode.qmlDelegate))
             }
         }
@@ -96,14 +97,10 @@ Page {
     StackView {
         id: modeStack
         anchors.fill: parent
+        initialItem: "qrc:/vol2com/qml/WorkModeSelector.qml"
         Component.onCompleted: {
-            if(viewModel.currentMode !== null)
-            {
-                push([Qt.resolvedUrl("qrc:/vol2com/qml/WorkModeSelector.qml"), Qt.resolvedUrl(viewModel.currentMode.qmlDelegate)])
-            }
-            else
-            {
-                push(Qt.resolvedUrl("qrc:/vol2com/qml/WorkModeSelector.qml"))
+            if(viewModel.currentMode){
+                push(viewModel.currentMode.qmlDelegate, {}, StackView.Immediate)
             }
         }
         onBusyChanged: {

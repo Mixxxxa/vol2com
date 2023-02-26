@@ -28,7 +28,7 @@ Button {
     property color hoveredColor: VC.AppStyle.accent
     flat: true
     background: Rectangle {
-        visible: control.hovered || control.down
+        visible: enabled && (control.hovered || control.down)
         color: control.hoveredColor
         opacity: control.down ? 0.85 : 1.0
     }

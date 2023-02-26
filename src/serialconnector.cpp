@@ -45,7 +45,6 @@ namespace vol2com
 {
   SerialConnector::SerialConnector(QObject *parent)
     : ConnectMethodBase(parent)
-    , m_port(SerialConnector::UnknownPort)
     , m_portsModel(new BasicQMLModel(this))
     , m_workerThread(nullptr)
     , m_worker(nullptr)
@@ -201,11 +200,12 @@ namespace vol2com
   void SerialConnector::save()
   {
     auto& settings = Settings::getInstance();
-    //settings.set(QString(::Name),  SettingsKeys::Port, m_port);
+    //settings.set(QString(::Name), SettingsKeys::Port, m_port);
     //settings.set(QString(::Name), SettingsKeys::Baudrate, m_baudrate);
     //settings.set(QString(::Name), SettingsKeys::Databits, m_dataBits);
     //settings.set(QString(::Name), SettingsKeys::Parity, m_parity);
     //settings.set(QString(::Name), SettingsKeys::StopBits, m_stopBits);
+    //settings.set(QString(::Name), SettingsKeys::FlowControl, m_flowControl);
     //settings.set(QString(::Name), SettingsKeys::AutoReconnect, m_autoReconnect);
   }
 
@@ -213,19 +213,26 @@ namespace vol2com
   {
     auto& settings = Settings::getInstance();
 
-    //const auto port = settings.get(QString(::Name), SettingsKeys::Port, SerialConnector::UnknownPort).toString();
-    //if(isPortNameCorrect(port) && isPortAvailable(port))
-    //  m_port = port;
-    //else if (m_portsModel->rowCount() > 0)
-    //  m_port = m_portsModel->data(m_portsModel->index(0),  BasicQMLModel::ValueRole).toString();
-    //else
-    //  m_port = SerialConnector::UnknownPort;
+    const auto port = settings.get(QString(::Name), SettingsKeys::Port, SerialConnector::UnknownPort).toString();
+    if(isPortNameCorrect(port) && isPortAvailable(port))
+    {
+      m_port = port;
+    }
+    else if (m_portsModel->rowCount() > 0)
+    {
+      m_port = m_portsModel->data(m_portsModel->index(0), BasicQMLModel::ValueRole).toString();
+    }
+    else
+    {
+      m_port = SerialConnector::UnknownPort;
+    }
 
-    //m_baudrate = settings.getEnum(QString(::Name), SettingsKeys::Baudrate, QSerialPort::Baud57600);
-    //m_dataBits = settings.getEnum(QString(::Name), SettingsKeys::Databits, QSerialPort::Data8);
-    //m_parity = settings.getEnum(QString(::Name), SettingsKeys::Parity, QSerialPort::NoParity);
-    //m_stopBits = settings.getEnum(QString(::Name), SettingsKeys::StopBits, QSerialPort::OneStop);
-    //m_autoReconnect = settings.get(QString(::Name), SettingsKeys::AutoReconnect, true).toBool();
+    m_baudrate = settings.getEnum(QString(::Name), SettingsKeys::Baudrate, SerialConnector::BaudRate::Baud57600);
+    m_dataBits = settings.getEnum(QString(::Name), SettingsKeys::Databits, SerialConnector::DataBits::Data8);
+    m_parity = settings.getEnum(QString(::Name), SettingsKeys::Parity, SerialConnector::Parity::NoParity);
+    m_stopBits = settings.getEnum(QString(::Name), SettingsKeys::StopBits, SerialConnector::StopBits::OneStop);
+    m_flowControl = settings.getEnum(QString(::Name), SettingsKeys::FlowControl, SerialConnector::FlowControl::NoFlowControl);
+    m_autoReconnect = settings.get(QString(::Name), SettingsKeys::AutoReconnect, true).toBool();
   }
 
   void SerialConnector::write(const QByteArray& data)
