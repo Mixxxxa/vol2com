@@ -19,10 +19,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.14
-import vol2com 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import vol2com
 
 StandartView {
     //Dialog {
@@ -76,7 +76,7 @@ StandartView {
         colorSource: viewModel.currentMode.colorSource
         Layout.preferredHeight: 160
         Layout.fillWidth: true
-        onRightMouseClicked: {
+        onRightMouseClicked: function(pos) {
             contextMenu.popup(pos)
         }
         onSelectedBandChanged: function(selectedBand){

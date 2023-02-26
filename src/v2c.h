@@ -25,7 +25,7 @@
 #define V2C_APP_NAME "vol2com"
 #define V2C_APP_DESCRIPTION "vol2com"
 //#define V2C_APP_DESCRIPTION "Open source tool to manage LED strips"
-#define V2C_EXE_NAME "vol2com.exe"
+//#define V2C_EXE_NAME "vol2com.exe"
 #define V2C_APP_VERSION 0,6,7
 #define V2C_APP_VERSION_STR "0.6.7\0"
 

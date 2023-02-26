@@ -19,22 +19,19 @@
 **
 ****************************************************************************/
 
-#ifndef UTILITY_H
-#define UTILITY_H
+#pragma once
 
 namespace vol2com
 {
-    template <typename T>
-    static inline constexpr T remap(T x, T in_min, T in_max, T out_min, T out_max)
-    {
-        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-    }
+  template <typename T>
+  static inline constexpr T remap(T x, T in_min, T in_max, T out_min, T out_max)
+  {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  }
 
-    template <typename T>
-    static inline constexpr T lerp(T startValue, T endValue, T step, T totalSteps)
-    {
-        return (endValue - startValue) * step / totalSteps + startValue;
-    }
+  template <typename T>
+  static inline constexpr T lerp(T startValue, T endValue, T step, T totalSteps)
+  {
+    return (endValue - startValue) * step / totalSteps + startValue;
+  }
 }
-
-#endif // UTILITY_H

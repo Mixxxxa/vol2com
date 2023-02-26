@@ -19,10 +19,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.14
-import vol2com 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import vol2com
 
 Page {
     id: aboutPageView
@@ -60,7 +60,7 @@ Page {
             text: viewmodel.commitText
             linkColor: AppStyle.accent
             Layout.fillWidth: true
-            onLinkActivated: {
+            onLinkActivated: function(link) {
                 Qt.openUrlExternally(link)
             }
         }
@@ -89,7 +89,7 @@ Page {
             lineHeight: 1.5
             linkColor: AppStyle.accent
             Layout.fillWidth: true
-            onLinkActivated: {
+            onLinkActivated: function(link) {
                 Qt.openUrlExternally(link)
             }
         }
@@ -124,7 +124,7 @@ Page {
             Button {
                 text: qsTr("Help and wiki")
                 onClicked: {
-                    Qt.openUrlExternally(viewmodel.githubLink + "/wiki/")
+                    Qt.openUrlExternally(viewmodel.wikiUrl)
                 }
                 Layout.fillWidth: true
             }

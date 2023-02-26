@@ -21,7 +21,7 @@
 
 import QtQuick
 import QtQuick.Controls
-import vol2com 1.0 as VC
+import vol2com as VC
 
 Button {
     id: control

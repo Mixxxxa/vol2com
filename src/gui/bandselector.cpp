@@ -25,7 +25,7 @@
 #include "bandselector.h"
 #include "controller.h"
 #include "equalizer.h"
-#include "utility.h"
+#include "utils/math.hpp"
 #include <QTimer>
 #include <QPainter>
 

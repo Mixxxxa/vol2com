@@ -26,32 +26,33 @@
 
 namespace vol2com
 {
-    class AboutPageViewModel : public QObject
-    {
-        Q_OBJECT
-        QML_ELEMENT
-        Q_PROPERTY(QString aboutText READ aboutText CONSTANT)
-        Q_PROPERTY(QString copyrightText READ copyrightText CONSTANT)
-        Q_PROPERTY(QString versionText READ versionText CONSTANT)
-        Q_PROPERTY(QString commitText READ commitText CONSTANT)
-        Q_PROPERTY(QString qtInfoText READ qtInfoText CONSTANT)
-        Q_PROPERTY(QString disclaimerText READ disclaimerText CONSTANT)
-        Q_PROPERTY(QString thirdPartyText READ thirdPartyText CONSTANT)
-        Q_PROPERTY(QString githubLink READ githubLink CONSTANT)
+  class AboutPageViewModel : public QObject
+  {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString aboutText READ aboutText CONSTANT)
+    Q_PROPERTY(QString copyrightText READ copyrightText CONSTANT)
+    Q_PROPERTY(QString versionText READ versionText CONSTANT)
+    Q_PROPERTY(QString commitText READ commitText CONSTANT)
+    Q_PROPERTY(QString qtInfoText READ qtInfoText CONSTANT)
+    Q_PROPERTY(QString disclaimerText READ disclaimerText CONSTANT)
+    Q_PROPERTY(QString thirdPartyText READ thirdPartyText CONSTANT)
+    Q_PROPERTY(QString githubLink READ githubLink CONSTANT)
+    Q_PROPERTY(QUrl wikiUrl READ githubLink CONSTANT)
 
-    public:
-        AboutPageViewModel() = default;
-        ~AboutPageViewModel() = default;
+  public:
+    using QObject::QObject;
 
-        QString aboutText() const;
-        QString versionText() const;
-        QString commitText() const;
-        QString qtInfoText() const;
-        QString disclaimerText() const;
-        QString thirdPartyText() const;
-        QString githubLink() const;
-        QString copyrightText() const;
-    };
+    QString aboutText() const;
+    QString versionText() const;
+    QString commitText() const;
+    QString qtInfoText() const;
+    QString disclaimerText() const;
+    QString thirdPartyText() const;
+    QString githubLink() const;
+    QString copyrightText() const;
+    QString wikiUrl() const;
+  };
 }
 
 #endif // ABOUTPAGEVIEWMODEL_H

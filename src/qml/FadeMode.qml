@@ -19,10 +19,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.14
-import vol2com 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import vol2com
 
 StandartView {
     ListDelegate {
@@ -90,9 +90,17 @@ StandartView {
         barsStyle: viewModel.currentMode.barsStyle
         showBandsBackground: true
         colorSource: BandSelector.ActiveMode
-        onSelectedBandChanged: viewModel.currentMode.selectedBand.value = selectedBand
-        onBarsStyleChanged: viewModel.currentMode.barsStyle = barsStyle
-        onShowBandsBackgroundChanged: viewModel.currentMode.showBackground = showBandsBackground
-        onColorSourceChanged: viewModel.currentMode.colorSource = colorSource
+        onSelectedBandChanged: function(selectedBand) {
+            viewModel.currentMode.selectedBand.value = selectedBand
+        }
+        onBarsStyleChanged: function(barsStyle) {
+            viewModel.currentMode.barsStyle = barsStyle
+        }
+        onShowBandsBackgroundChanged: function(showBandsBackground) {
+            viewModel.currentMode.showBackground = showBandsBackground
+        }
+        onColorSourceChanged: function(colorSource) {
+            viewModel.currentMode.colorSource = colorSource
+        }
     }
 }

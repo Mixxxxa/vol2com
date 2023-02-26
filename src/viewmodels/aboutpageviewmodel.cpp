@@ -25,104 +25,153 @@
 #include "aboutpageviewmodel.h"
 #include <QCoreApplication>
 #include <array>
-
-using namespace vol2com;
+#include <QUrl>
+#include <QVersionNumber>
+#include "utils/gitinfo.h"
 
 namespace
 {
-    struct ThirdPartyEntry
-    {
-        const wchar_t * const name;
-        const wchar_t * const link;
-    };
+  QString CreateHTMLLink(QString name, QString link)
+  {
+    const auto url = QUrl{ link };
+    Q_ASSERT(url.isValid());
+    const auto escapedName = name.toHtmlEscaped();
+    Q_ASSERT(name == escapedName);
 
-    constexpr std::array<ThirdPartyEntry, 2> ThirdPartyEntries =
+    return QStringLiteral(R"delim(<a href="%2">%1</a>)delim").arg(escapedName, url.toEncoded());
+  }
+
+  QString getCompilerInfo()
+  {
+    using namespace Qt::StringLiterals;
+
+#if defined(Q_CC_CLANG)
+    const auto clangVersion = QVersionNumber(__clang_major__, __clang_minor__, __clang_patchlevel__);
+    return u"Clang %1"_s.arg(clangVersion.normalized().toString());
+#elif defined(Q_CC_GNU)
+    return u"GCC %1"_s.arg(__VERSION__);
+#elif defined(Q_CC_MSVC)
+    QString msvcRelease;
+    if constexpr(_MSC_VER >= 1930 && _MSC_VER < 1940)
+    {
+      msvcRelease = u"2022"_s;
+    }
+    else if constexpr(_MSC_VER >= 1920)
+    {
+      msvcRelease = u"2019"_s;
+    }
+    else if constexpr(_MSC_VER >= 1910)
+    {
+      msvcRelease = u"2017"_s;
+    }
+    else if constexpr(_MSC_VER >= 1900)
+    {
+      msvcRelease = u"2015"_s;
+    }
+    else
+    {
+      msvcRelease = u"Unknown"_s;
+    }
+
+    const auto check = u"MSVC %1 (%2)"_s.arg(msvcRelease).arg(_MSC_VER);
+
+    return u"MSVC %1 (%2)"_s.arg(msvcRelease).arg(_MSC_VER);
+#endif
+    return u"Unknown compiler"_s;
+  }
+}
+
+namespace vol2com
+{
+  QString AboutPageViewModel::aboutText() const
+  {
+    return tr("<b>%1</b> - simple open source LED strip management software.")
+        .arg(QCoreApplication::applicationName());
+  }
+
+  QString AboutPageViewModel::versionText() const
+  {
+    return tr("Version: %1").arg(QCoreApplication::applicationVersion());
+  }
+
+  QString AboutPageViewModel::commitText() const
+  {
+    using namespace Qt::StringLiterals;
+
+    const auto &branch   = QStringLiteral(GIT_BRANCH);
+    const auto &shortRev = QStringLiteral(GIT_SHORT_REV);
+    const auto &fullRev  = QStringLiteral(GIT_FULL_REV);
+
+    if(fullRev.isEmpty() || shortRev.isEmpty())
+    {
+      return u"Build based on custom build"_s;
+    }
+
+    const auto &commitLink = u"%1/commit/%2"_s.arg(githubLink(), fullRev);
+    auto result = tr("Build based on commit: %1").arg(CreateHTMLLink(shortRev, commitLink));
+
+    if(!branch.isEmpty())
+    {
+      const auto &branchLink = u"%1/tree/%2"_s.arg(githubLink(), branch);
+      result += u" [%1]"_s.arg(CreateHTMLLink(branch, branchLink));
+    }
+
+    return result;
+  }
+
+  QString AboutPageViewModel::qtInfoText() const
+  {
+    return tr("App based on Qt version %1 (%2, %3 bit)")
+        .arg(QStringLiteral(QT_VERSION_STR),
+             getCompilerInfo(),
+             QString::number(QSysInfo::WordSize, 10));
+  }
+
+  QString AboutPageViewModel::disclaimerText() const
+  {
+    return tr("The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.");
+  }
+
+  QString AboutPageViewModel::thirdPartyText() const
+  {
+    using namespace Qt::StringLiterals;
+    using ThirdPartyEntry = std::pair<QLatin1StringView,
+                                      QLatin1StringView>;
+
+    static constexpr std::array<ThirdPartyEntry, 2> ThirdPartyEntries =
     {{
-         {L"Bass library", L"https://www.un4seen.com/"},
-         {L"WinToast", L"https://github.com/mohabouje/WinToast/"}
+        { "Bass library"_L1, "https://www.un4seen.com/"_L1 }
+      , { "WinToast"_L1,     "https://github.com/mohabouje/WinToast/"_L1 }
     }};
 
-    constexpr auto GitHubProjectUrl = "https://github.com/Mixxxxa/vol2com";
-
-    QString getCommitLink()
-    {
-        return QLatin1String("<a href=\"%1/commit/%2\">%2</a>")
-                .arg(GitHubProjectUrl)
-                .arg("#FIXME");
-    }
-
-    QString getCompilerInfo()
-    {
-#if defined(Q_CC_CLANG)
-        return QLatin1String("Clang " ) + QString::number(__clang_major__)
-                     + QLatin1Char('.') + QString::number(__clang_minor__);
-#elif defined(Q_CC_GNU)
-        return QLatin1String("GCC ") + QLatin1String(__VERSION__);
-#elif defined(Q_CC_MSVC)
-        if(_MSC_VER > 1999)
-            return QLatin1String("MSVC (unknown)");
-        if(_MSC_VER >= 1920)
-            return QLatin1String("MSVC 2019");
-        if(_MSC_VER >= 1910)
-            return QLatin1String("MSVC 2017");
-        if(_MSC_VER >= 1900)
-            return QLatin1String("MSVC 2015");
-#endif
-        return QLatin1String("<unknown compiler version>");
-    }
-}
-
-QString AboutPageViewModel::aboutText() const
-{
-    return tr("<b>%1</b> - simple open source LED strip management software.")
-            .arg(QCoreApplication::applicationName());
-}
-
-QString AboutPageViewModel::versionText() const
-{
-    return tr("Version: %1")
-            .arg(QCoreApplication::applicationVersion());
-}
-
-QString AboutPageViewModel::commitText() const
-{
-    return tr("Build based on commit: %1 [%2]")
-      .arg(getCommitLink(), QLatin1String("#FIXME"));
-}
-
-QString AboutPageViewModel::qtInfoText() const
-{
-    return tr("App based on Qt version %1 (%2, %3 bit)")
-            .arg(QLatin1String(QT_VERSION_STR),
-                 getCompilerInfo(),
-                 QString::number(QSysInfo::WordSize, 10));
-}
-
-QString AboutPageViewModel::disclaimerText() const
-{
-    return tr("The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.");
-}
-
-QString AboutPageViewModel::thirdPartyText() const
-{
     QString result;
-    for(size_t i = 0; i < ::ThirdPartyEntries.size(); ++i)
+    for(auto &&[name, link] : ThirdPartyEntries)
     {
-        result += QStringLiteral("%1) %2 - <a href=\"%3\">%3</a>")
-                .arg(static_cast<int>(i + 1))
-                .arg(::ThirdPartyEntries[i].name, ::ThirdPartyEntries[i].link);
-        if(i != ::ThirdPartyEntries.size() - 1)
-            result += QStringLiteral("<br></br>");
+      if(!result.isEmpty())
+      {
+        result += QStringLiteral("<br></br>");
+      }
+      result += u"%1 - %2"_s.arg(name, CreateHTMLLink(link, link));
     }
+
     return result;
-}
+  }
 
-QString AboutPageViewModel::githubLink() const
-{
-    return QLatin1String(::GitHubProjectUrl);
-}
+  QString AboutPageViewModel::githubLink() const
+  {
+    using namespace Qt::StringLiterals;
+    return u"https://github.com/Mixxxxa/vol2com"_s;
+  }
 
-QString AboutPageViewModel::copyrightText() const
-{
-    return "Copyright (C) 2020-2021 Mixxxxa <gelvikhmikhail@gmail.com>";
+  QString AboutPageViewModel::copyrightText() const
+  {
+    using namespace Qt::StringLiterals;
+    return u"Copyright (C) 2020-2023 Mixxxxa"_s;
+  }
+
+  QString AboutPageViewModel::wikiUrl() const
+  {
+    using namespace Qt::StringLiterals;
+    return u"%1/wiki"_s.arg(githubLink());
+  }
 }

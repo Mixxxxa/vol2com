@@ -23,7 +23,7 @@
 #define FADEMODE_H
 
 #include "workmodewithselector.h"
-#include "boundedvalue.h"
+#include "utils/boundedvalue.h"
 
 namespace vol2com
 {

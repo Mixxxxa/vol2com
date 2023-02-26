@@ -22,13 +22,7 @@
 **
 ****************************************************************************/
 
-//#include <QGuiApplication>
-
-//#include "controller.h"
-//#include "settings.h"
-//#include "v2c.h"
-//#include "translator.h"
-
+#include "v2c.h"
 #include <QGuiApplication>
 #include <QQuickStyle>
 #include <QQmlApplicationEngine>
@@ -39,6 +33,9 @@
 
 int main(int argc, char *argv[])
 {
+  QCoreApplication::setApplicationName(V2C_APP_NAME);
+  QCoreApplication::setApplicationVersion(V2C_APP_VERSION_STR);
+
   QQuickStyle::setStyle(QLatin1String("Universal"));
   QGuiApplication app(argc, argv);
 
@@ -54,25 +51,5 @@ int main(int argc, char *argv[])
 
   auto& controller = vol2com::Controller::getInstance();
   controller.openUI();
-
-
-
   return app.exec();
-
-  ////QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  //QCoreApplication::setApplicationName(V2C_APP_NAME);
-  //QCoreApplication::setApplicationVersion(V2C_APP_VERSION_STR);
-  //QQuickStyle::setStyle(QLatin1String("Universal"));
-
-  //QGuiApplication app(argc, argv);
-  ////app.setQuitOnLastWindowClosed(false);
-
-  //vol2com::Translator translator;
-  //translator.loadTranslation();
-
-  //auto& controller = vol2com::Controller::getInstance();
-  //controller.init();
-  //controller.openUI();
-
-  //return app.exec();
 }

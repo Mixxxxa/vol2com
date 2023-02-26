@@ -26,7 +26,7 @@
 #include "basslibwrapper.h"
 #include "equalizer.h"
 #include "settings.h"
-#include "utility.h"
+#include "utils/math.hpp"
 #include <QByteArray>
 
 namespace

@@ -23,7 +23,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 import vol2com as VC
-//import vol2com.Popups 1.0
 
 Rectangle {
     id: mainView
@@ -97,21 +96,21 @@ Rectangle {
         visible: mainWindow.visibility === Window.Windowed
     }
 
-//    Component.onCompleted: {
-//        if(Settings.photosensitiveWarningAccepted === false)
-//        {
-//            let comp = Qt.createComponent("qrc:/qml/vol2com/Popups/EpilepsyWarningPopup.qml");
-//            if (comp && comp.status === Component.Ready) {
-//                let warning = comp.createObject(mainView);
-//                if (warning) {
-//                    warning.rejected.connect(function(){
-//                        Controller.exit();
-//                    });
-//                    warning.open()
-//                }
-//            }
-//        }
-//    }
+    Component.onCompleted: {
+        if(Settings.photosensitiveWarningAccepted === false)
+        {
+            let comp = Qt.createComponent("qrc:/vol2com/qml/EpilepsyWarningPopup.qml");
+            if (comp && comp.status === Component.Ready) {
+                let warning = comp.createObject(mainView);
+                if (warning) {
+                    warning.rejected.connect(function(){
+                        Controller.exit();
+                    });
+                    warning.open()
+                }
+            }
+        }
+    }
 
     //Connections {
     //    target: Controller

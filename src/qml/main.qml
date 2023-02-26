@@ -20,12 +20,9 @@
 ****************************************************************************/
 
 import QtQuick
-//import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Universal
-//import QtQuick.Window
 import vol2com
-//import vol2com.Views 1.0
 
 Window {
     id: mainWindow

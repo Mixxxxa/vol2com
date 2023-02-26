@@ -24,7 +24,7 @@
 
 #include "christmasmode.h"
 #include "settings.h"
-#include "utility.h"
+#include "utils/math.hpp"
 #include <QTimer>
 
 using namespace::vol2com;

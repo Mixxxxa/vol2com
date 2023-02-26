@@ -19,9 +19,9 @@
 **
 ****************************************************************************/
 
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.14
-import vol2com 1.0
+import QtQuick.Controls
+import QtQuick.Layouts
+import vol2com
 
 Page {
     title: qsTr("Connection")

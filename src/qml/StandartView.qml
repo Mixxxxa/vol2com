@@ -19,10 +19,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15 as C
-import QtQuick.Layouts 1.14
-import vol2com 1.0
+import QtQuick
+import QtQuick.Controls as C
+import QtQuick.Layouts
+import vol2com
 
 //Flickable {
 //    default property alias items: pageLayout.children

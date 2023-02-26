@@ -26,7 +26,7 @@
 #include "workmodes/workmodebase.h"
 #include "controller.h"
 #include "equalizer.h"
-#include "utility.h"
+#include "utils/math.hpp"
 #include <QPainter>
 #include <algorithm>
 
