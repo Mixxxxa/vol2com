@@ -142,7 +142,17 @@ qt_add_qml_module(appvol2com
 install(TARGETS appvol2com
     #RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+qt_generate_deploy_qml_app_script(
+    TARGET appvol2com
+    FILENAME_VARIABLE deploy_script
+)
+install(SCRIPT ${deploy_script})
+install(FILES $<TARGET_PROPERTY:bass_lib,IMPORTED_LOCATION>
+              $<TARGET_PROPERTY:basswasapi_lib,IMPORTED_LOCATION>
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 target_compile_definitions(appvol2com PRIVATE
