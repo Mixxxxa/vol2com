@@ -3,9 +3,9 @@ Simple open source LED strip management software.
 The main advantage of the program is the ability to control the color depended on the music being played. Also, the advantages of the program include support for various types of connections, a large number of operating modes (with the settings for each of them), the presence of an equalizer for fine-tuning the values and a lot of other useful functions.
 
 <p align="middle">
-  <img src="assets/Connection.png" alt="ConnectionPage" width="33%"/>
-  <img src="assets/ModeSelector.png" alt="OperatingModesPage" width="33%"/>
-  <img src="assets/Equalizer.png" alt="EqualizerPage" width="33%"/>
+  <img src=".github/Connection.png" alt="ConnectionPage" width="33%"/>
+  <img src=".github/ModeSelector.png" alt="OperatingModesPage" width="33%"/>
+  <img src=".github/Equalizer.png" alt="EqualizerPage" width="33%"/>
 </p>
 
 - [Features](#features)
@@ -25,10 +25,10 @@ The main advantage of the program is the ability to control the color depended o
 ## Operating modes
 | Name | Description | Screenshot |
 | ------------- |:-------------:| -----:|
-| General | Analyses sound and send color corresponding color | <img src="assets/General.png" width="300"> |
-| Fade | Blinks selected color to the beat of the music | <img src="assets/Fade.png" width="300"> |
+| General | Analyses sound and send color corresponding color | <img src=".github/General.png" width="300"> |
+| Fade | Blinks selected color to the beat of the music | <img src=".github/Fade.png" width="300"> |
 | Random | Smoothly changes current color in random direction | Nothing to see here) |
-| Manual | Sends selected color. HSV color selector available and a few predefined colors | <img src="assets/Manual.png" width="300"> |
+| Manual | Sends selected color. HSV color selector available and a few predefined colors | <img src=".github/Manual.png" width="300"> |
 
 You can suggest new operating modes via [issues](https://github.com/Mixxxxa/vol2com/issues).
 

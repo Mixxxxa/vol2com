@@ -25,12 +25,14 @@
 #include <QObject>
 #include "connectmethodbase.h"
 #include "controller.h"
+#include <QtQml/qqmlregistration.h>
 
 namespace vol2com
 {
     class ConnectPageViewModel : public QObject
     {
         Q_OBJECT
+        QML_ELEMENT
         Q_PROPERTY(QString qmlDelegate READ qmlDelegate NOTIFY qmlDelegateChanged)
         Q_PROPERTY(vol2com::Controller::ConnectType connectType READ connectType WRITE setConnectType NOTIFY connectTypeChanged)
         Q_PROPERTY(vol2com::ConnectMethodBase::State state READ state NOTIFY stateChanged)

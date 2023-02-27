@@ -24,7 +24,7 @@
 
 #include "workmodebase.h"
 #include "gui/abstractbandviewer.h"
-#include "boundedvalue.h"
+#include "utils/boundedvalue.h"
 #include <memory>
 #include <functional>
 #include <QColor>

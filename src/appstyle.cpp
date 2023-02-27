@@ -22,13 +22,14 @@
 **
 ****************************************************************************/
 
-#pragma comment(lib, "WindowsApp")
+//#pragma comment(lib, "WindowsApp")
 #include "appstyle.h"
 #include <QGuiApplication>
+#include <QJSEngine>
 
-using namespace winrt;
-using namespace Windows::Foundation;
-using namespace Windows::UI::ViewManagement;
+//using namespace winrt;
+//using namespace Windows::Foundation;
+//using namespace Windows::UI::ViewManagement;
 using namespace vol2com;
 
 AppStyle& AppStyle::getInstance()
@@ -37,11 +38,18 @@ AppStyle& AppStyle::getInstance()
     return instance;
 }
 
-void AppStyle::onWindowsColorsChanged(const UISettings& sender, const IInspectable& val)
+//void AppStyle::onWindowsColorsChanged(const UISettings& sender, const IInspectable& val)
+//{
+//    Q_UNUSED(sender)
+//    Q_UNUSED(val)
+//    repaint();
+//}
+
+AppStyle *AppStyle::create(QQmlEngine *, QJSEngine *engine)
 {
-    Q_UNUSED(sender)
-    Q_UNUSED(val)
-    repaint();
+  auto *result = &(AppStyle::getInstance());
+  QJSEngine::setObjectOwnership(result, QJSEngine::ObjectOwnership::CppOwnership);
+  return result;
 }
 
 void AppStyle::setTheme(AppStyle::Theme theme)
@@ -53,26 +61,26 @@ void AppStyle::setTheme(AppStyle::Theme theme)
     emit themeChanged(m_theme);
 }
 
-constexpr QColor AppStyle::WinRTColorToQColor(const Windows::UI::Color& color) const
-{
-    return QColor(color.R, color.G, color.B);
-}
+//constexpr QColor AppStyle::WinRTColorToQColor(const Windows::UI::Color& color) const
+//{
+//    return QColor(color.R, color.G, color.B);
+//}
 
 void AppStyle::repaint()
 {
-    m_accent = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::Accent));
-    m_accentLight1 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentLight1));
-    m_accentLight2 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentLight2));
-    m_accentLight3 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentLight3));
-    m_accentDark1 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentDark1));
-    m_accentDark2 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentDark2));
-    m_accentDark3 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentDark3));
-    //m_foreground = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::Foreground));
-    //m_background = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::Background));
+    //m_accent = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::Accent));
+    //m_accentLight1 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentLight1));
+    //m_accentLight2 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentLight2));
+    //m_accentLight3 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentLight3));
+    //m_accentDark1 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentDark1));
+    //m_accentDark2 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentDark2));
+    //m_accentDark3 = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::AccentDark3));
+    ////m_foreground = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::Foreground));
+    ////m_background = WinRTColorToQColor(m_uiSettings.GetColorValue(UIColorType::Background));
     m_foreground = QColor(m_theme == Theme::Dark ? Qt::white : Qt::black);
     m_background = QColor(m_theme == Theme::Dark ? Qt::black : Qt::white);
-    m_grayText = WinRTColorToQColor(m_uiSettings.UIElementColor(UIElementType::GrayText));
-
+    //m_grayText = WinRTColorToQColor(m_uiSettings.UIElementColor(UIElementType::GrayText));
+    //
     emit accentChanged(m_accent);
     emit accentDark1Changed(m_accentDark1);
     emit accentDark2Changed(m_accentDark2);
@@ -106,10 +114,10 @@ AppStyle::AppStyle(QObject *parent) :
     m_textFont.setPixelSize(16);
     m_textFont.setWeight(QFont::Normal);
     m_iconFont.setPixelSize(18);
-    m_colorsChangeToken = m_uiSettings.ColorValuesChanged(winrt::auto_revoke, {this, &AppStyle::onWindowsColorsChanged});
+    //m_colorsChangeToken = m_uiSettings.ColorValuesChanged(winrt::auto_revoke, {this, &AppStyle::onWindowsColorsChanged});
 
     QObject::connect(this, &AppStyle::themeChanged,
                      this, &AppStyle::repaint);
 
-    repaint();
+    //repaint();
 }

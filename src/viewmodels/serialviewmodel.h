@@ -19,88 +19,97 @@
 **
 ****************************************************************************/
 
-#ifndef SERIALVIEWMODEL_H
-#define SERIALVIEWMODEL_H
+#pragma once
 
 #include <QObject>
 #include <memory>
 #include "connectmethodbase.h"
-#include <QSerialPort>
+//#include <QSerialPort>
+#include "serialconnector.h"
+#include <QtQml/qqmlregistration.h>
+
+class QAbstractListModel;
 
 namespace vol2com
 {
-    class BasicQMLModel;
-    class Serial;
+  class SerialViewModel : public QObject
+  {
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(QString port READ port WRITE setPort NOTIFY portChanged)
+    Q_PROPERTY(SerialConnector::BaudRate baudrate READ baudrate WRITE setBaudrate NOTIFY baudrateChanged)
+    Q_PROPERTY(SerialConnector::DataBits dataBits READ dataBits WRITE setDataBits NOTIFY dataBitsChanged)
+    Q_PROPERTY(SerialConnector::Parity parity READ parity WRITE setParity NOTIFY parityChanged)
+    Q_PROPERTY(SerialConnector::StopBits stopBits READ stopBits WRITE setStopBits NOTIFY stopBitsChanged)
+    Q_PROPERTY(SerialConnector::FlowControl flowControl READ flowControl WRITE setFlowControl NOTIFY flowControlChanged)
+    Q_PROPERTY(bool autoReconnect READ autoReconnect WRITE setAutoReconnect NOTIFY autoReconnectChanged)
 
-    class SerialViewModel : public QObject
-    {
-        Q_OBJECT
-        Q_PROPERTY(QString port READ port WRITE setPort NOTIFY portChanged)
-        Q_PROPERTY(QSerialPort::BaudRate baudrate READ baudrate WRITE setBaudrate NOTIFY baudrateChanged)
-        Q_PROPERTY(QSerialPort::DataBits dataBits READ dataBits WRITE setDataBits NOTIFY dataBitsChanged)
-        Q_PROPERTY(QSerialPort::Parity parity READ parity WRITE setParity NOTIFY parityChanged)
-        Q_PROPERTY(QSerialPort::StopBits stopBits READ stopBits WRITE setStopBits NOTIFY stopBitsChanged)
-        Q_PROPERTY(bool autoReconnect READ autoReconnect WRITE setAutoReconnect NOTIFY autoReconnectChanged)
-        Q_PROPERTY(bool arePortsAvailable READ arePortsAvailable NOTIFY arePortsAvailableChanged)
-        Q_PROPERTY(bool availableForEdit READ availableForEdit NOTIFY availableForEditChanged)
-        Q_PROPERTY(vol2com::BasicQMLModel* portsModel READ portsModel CONSTANT)
-        Q_PROPERTY(vol2com::ConnectMethodBase::State state READ state NOTIFY stateChanged)
+    Q_PROPERTY(bool arePortsAvailable READ arePortsAvailable NOTIFY arePortsAvailableChanged)
+    Q_PROPERTY(bool availableForEdit READ availableForEdit NOTIFY availableForEditChanged)
+    Q_PROPERTY(QAbstractListModel* portsModel READ portsModel CONSTANT)
+    Q_PROPERTY(vol2com::ConnectMethodBase::State state READ state NOTIFY stateChanged)
 
-    public:
-        SerialViewModel(QObject* parent = nullptr);
-        QString port() const { return m_port; }
-        QSerialPort::BaudRate baudrate() const { return m_baudrate; }
-        QSerialPort::DataBits dataBits() const { return m_dataBits; }
-        QSerialPort::Parity parity() const { return m_parity; }
-        QSerialPort::StopBits stopBits() const { return m_stopBits; }
-        bool autoReconnect() const { return m_autoReconnect; }
-        bool arePortsAvailable() const { return m_arePortsAvailable; }
-        bool availableForEdit() const { return m_availableForEdit; }
-        vol2com::BasicQMLModel* portsModel() const { return m_portsModel; }
-        vol2com::ConnectMethodBase::State state() const { return m_state; }
+  public:
+    SerialViewModel(QObject* parent = nullptr);
 
-    public slots:
-        void setPort(const QString& port);
-        void setBaudrate(const QSerialPort::BaudRate& baudrate);
-        void setDataBits(const QSerialPort::DataBits& dataBits);
-        void setParity(const QSerialPort::Parity& parity);
-        void setStopBits(const QSerialPort::StopBits& stopBits);
-        void setAutoReconnect(bool autoReconnect);
-        void setArePortsAvailable(bool arePortsAvailable);
-        void connectDevice();
-        void disconnectDevice();
-        void updatePortsList();
+    const QString &port() const noexcept { return m_port; }
+    SerialConnector::BaudRate baudrate() const noexcept { return m_baudrate; }
+    SerialConnector::DataBits dataBits() const noexcept { return m_dataBits; }
+    SerialConnector::Parity parity() const noexcept { return m_parity; }
+    SerialConnector::StopBits stopBits() const noexcept { return m_stopBits; }
+    SerialConnector::FlowControl flowControl() const noexcept;
+    bool autoReconnect() const noexcept { return m_autoReconnect; }
 
-    signals:
-        void portChanged(const QString& port);
-        void baudrateChanged(const QSerialPort::BaudRate& baudrate);
-        void dataBitsChanged(const QSerialPort::DataBits& dataBits);
-        void parityChanged(const QSerialPort::Parity& parity);
-        void stopBitsChanged(const QSerialPort::StopBits& stopBits);
-        void autoReconnectChanged(bool autoReconnect);
-        void arePortsAvailableChanged(bool arePortsAvailable);
-        void availableForEditChanged(bool availableForEdit);
-        void stateChanged(vol2com::ConnectMethodBase::State state);
+    bool arePortsAvailable() const { return m_arePortsAvailable; }
+    bool availableForEdit() const { return m_availableForEdit; }
+    QAbstractListModel* portsModel() const { return m_portsModel; }
+    vol2com::ConnectMethodBase::State state() const { return m_state; }
 
-    private:
-        std::shared_ptr<Serial> m_serial;
-        QString m_port;
-        QSerialPort::BaudRate m_baudrate;
-        QSerialPort::DataBits m_dataBits;
-        QSerialPort::Parity m_parity;
-        QSerialPort::StopBits m_stopBits;
-        bool m_autoReconnect;
-        bool m_arePortsAvailable;
-        bool m_availableForEdit;
-        BasicQMLModel* m_portsModel;
-        ConnectMethodBase::State m_state;
+  public slots:
+    void setPort(const QString& port);
+    void setBaudrate(SerialConnector::BaudRate baudrate);
+    void setDataBits(SerialConnector::DataBits dataBits);
+    void setParity(SerialConnector::Parity parity);
+    void setStopBits(SerialConnector::StopBits stopBits);
+    void setFlowControl(SerialConnector::FlowControl newFlowControl);
+    void setAutoReconnect(bool autoReconnect);
 
-    private slots:
-        void setState(const ConnectMethodBase::State& state);
-        void setAvailableForEdit(bool availableForEdit);
-        void onPortsModelRefreshed();
-        void onStateChanged(const ConnectMethodBase::State& state);
-    };
+    void setArePortsAvailable(bool arePortsAvailable);
+    void requestConnect();
+    void requestDisconnect();
+    void updatePortsList();
+
+  signals:
+    void portChanged(const QString& port);
+    void baudrateChanged(SerialConnector::BaudRate baudrate);
+    void dataBitsChanged(SerialConnector::DataBits dataBits);
+    void parityChanged(SerialConnector::Parity parity);
+    void stopBitsChanged(SerialConnector::StopBits stopBits);
+    void flowControlChanged(SerialConnector::FlowControl flowControl);
+    void autoReconnectChanged(bool autoReconnect);
+
+    void arePortsAvailableChanged(bool arePortsAvailable);
+    void availableForEditChanged(bool availableForEdit);
+    void stateChanged(vol2com::ConnectMethodBase::State state);
+
+  private:
+    std::shared_ptr<SerialConnector> m_serial;
+    QString m_port;
+    SerialConnector::BaudRate m_baudrate;
+    SerialConnector::DataBits m_dataBits;
+    SerialConnector::Parity m_parity;
+    SerialConnector::StopBits m_stopBits;
+    SerialConnector::FlowControl m_flowControl;
+    bool m_autoReconnect;
+    bool m_arePortsAvailable;
+    bool m_availableForEdit;
+    QAbstractListModel* m_portsModel;
+    ConnectMethodBase::State m_state;
+
+  private slots:
+    void setState(const ConnectMethodBase::State& state);
+    void setAvailableForEdit(bool availableForEdit);
+    void onPortsModelRefreshed();
+    void onStateChanged(const ConnectMethodBase::State& state);
+  };
 }
-
-#endif // SERIALVIEWMODEL_H

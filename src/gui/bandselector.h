@@ -27,6 +27,7 @@
 #include "workmodes/workmodewithselector.h"
 #include <QBrush>
 #include <memory>
+#include <QtQml/qqmlregistration.h>
 
 namespace vol2com
 {
@@ -35,6 +36,7 @@ namespace vol2com
     class BandSelector : public AbstractBandViewer
     {
         Q_OBJECT
+        QML_ELEMENT
 
     public:
         BandSelector(QQuickItem* parent = nullptr);

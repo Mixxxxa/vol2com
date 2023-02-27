@@ -25,7 +25,7 @@
 #include "generalmode.h"
 #include "basslibwrapper.h"
 #include "equalizer.h"
-#include "utility.h"
+#include "utils/math.hpp"
 #include <QByteArray>
 
 using namespace vol2com;

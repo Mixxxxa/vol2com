@@ -23,7 +23,7 @@
 #define CHRISTMASMODE_H
 
 #include "workmodebase.h"
-#include "boundedvalue.h"
+#include "utils/boundedvalue.h"
 #include <QColor>
 #include <memory>
 #include <array>

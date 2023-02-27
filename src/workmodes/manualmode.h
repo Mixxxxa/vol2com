@@ -23,7 +23,7 @@
 #define MANUALMODE_H
 
 #include "workmodebase.h"
-#include "boundedvalue.h"
+#include "utils/boundedvalue.h"
 #include <QColor>
 
 namespace vol2com

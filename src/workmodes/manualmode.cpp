@@ -24,7 +24,7 @@
 
 #include "manualmode.h"
 #include "settings.h"
-#include "utility.h"
+#include "utils/math.hpp"
 
 using namespace vol2com;
 

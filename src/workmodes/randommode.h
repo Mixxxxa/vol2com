@@ -23,7 +23,7 @@
 #define RANDOMMODE_H
 
 #include "workmodebase.h"
-#include "boundedvalue.h"
+#include "utils/boundedvalue.h"
 #include <memory>
 
 class QTimer;

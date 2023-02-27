@@ -19,11 +19,15 @@
 **
 ****************************************************************************/
 
-#ifndef UIVIEWMODEL_H
-#define UIVIEWMODEL_H
+//#ifndef UIVIEWMODEL_H
+//#define UIVIEWMODEL_H
+#pragma once
 
 #include <QObject>
 #include "controller.h"
+
+#include <QtQml/qqmlregistration.h>
+//#include <qqml.h>
 
 namespace vol2com
 {
@@ -33,6 +37,7 @@ namespace vol2com
         Q_PROPERTY(vol2com::Controller::Page page READ page WRITE setPage NOTIFY pageChanged)
         Q_PROPERTY(bool showStatus READ showStatus WRITE setShowStatus NOTIFY showStatusChanged)
         Q_PROPERTY(bool backarrowActive READ backarrowActive WRITE setBackarrowActive NOTIFY backarrowActiveChanged)
+        QML_ELEMENT
 
     public:
         explicit ToolbarViewModel(QObject *parent = nullptr);
@@ -62,4 +67,4 @@ namespace vol2com
     };
 }
 
-#endif // UIVIEWMODEL_H
+//#endif // UIVIEWMODEL_H

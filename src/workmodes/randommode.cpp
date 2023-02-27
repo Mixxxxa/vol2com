@@ -25,7 +25,7 @@
 #include "randommode.h"
 #include "submodebase.h"
 #include "settings.h"
-#include "utility.h"
+#include "utils/math.hpp"
 #include <QTimer>
 #include <ctime>
 #include <random>

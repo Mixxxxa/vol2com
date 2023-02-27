@@ -22,29 +22,34 @@
 **
 ****************************************************************************/
 
+#include "v2c.h"
 #include <QGuiApplication>
 #include <QQuickStyle>
+#include <QQmlApplicationEngine>
 #include "controller.h"
-#include "settings.h"
-#include "v2c.h"
-#include "translator.h"
+
+#include <QLocale>
+#include <QTranslator>
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setApplicationName(V2C_APP_NAME);
-    QCoreApplication::setApplicationVersion(V2C_APP_VERSION_STR);
-    QQuickStyle::setStyle(QLatin1String("Universal"));
+  QCoreApplication::setApplicationName(V2C_APP_NAME);
+  QCoreApplication::setApplicationVersion(V2C_APP_VERSION_STR);
 
-    QGuiApplication app(argc, argv);
-    app.setQuitOnLastWindowClosed(false);
+  QQuickStyle::setStyle(QLatin1String("Universal"));
+  QGuiApplication app(argc, argv);
 
-    vol2com::Translator translator;
-    translator.loadTranslation();
+  QTranslator translator;
+  const QStringList uiLanguages = QLocale::system().uiLanguages();
+  for (const QString &locale : uiLanguages) {
+    const QString baseName = "vol2com_" + QLocale(locale).name();
+    if (translator.load(":/i18n/" + baseName)) {
+      app.installTranslator(&translator);
+      break;
+    }
+  }
 
-    auto& controller = vol2com::Controller::getInstance();
-    controller.init();
-    controller.openUI();
-
-    return app.exec();
+  auto& controller = vol2com::Controller::getInstance();
+  controller.openUI();
+  return app.exec();
 }

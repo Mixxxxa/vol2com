@@ -19,55 +19,54 @@
 **
 ****************************************************************************/
 
-#ifndef BASICQMLMODEL_H
-#define BASICQMLMODEL_H
+#pragma once
 
 #include <QAbstractListModel>
 #include <vector>
+#include <QtQml/qqmlregistration.h>
 
 namespace vol2com
 {
+  class BasicQMLModel : public QAbstractListModel
+  {
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("")
+
+  public:
     struct BasicQMLModelItemData
     {
-        BasicQMLModelItemData(const QVariant& _text, const QVariant& _value, const QVariant& _image = QVariant()) :
-            text(_text),
-            value(_value),
-            image(_image)
-        {}
-
-        QVariant text;
-        QVariant value;
-        QVariant image;
+      QVariant text;
+      QVariant value;
+      QVariant image;
     };
 
-    class BasicQMLModel : public QAbstractListModel
+    using value_type = BasicQMLModelItemData;
+    using container_type = std::vector<value_type>;
+
+    enum Roles
     {
-        Q_OBJECT
-    public:
-        enum Roles
-        {
-            TextRole = Qt::UserRole + 1,
-            ValueRole,
-            ImageRole
-        };
-
-        BasicQMLModel(QObject *parent = nullptr);
-
-        virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-        virtual QVariant data(const QModelIndex& index, int role) const override;
-
-        Q_INVOKABLE int findIndex(const QVariant& value) const;
-        void add(QVariant&& text, QVariant&& value, QVariant&& image = QVariant());
-        void clear();
-
-    protected:
-        virtual QHash<int, QByteArray> roleNames() const override;
-
-    private:
-        std::vector<BasicQMLModelItemData> m_data;
+        TextRole = Qt::UserRole + 1
+      , ValueRole
+      , ImageRole
     };
+
+    BasicQMLModel(QObject *parent = nullptr);
+
+    virtual int rowCount(const QModelIndex& = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
+
+    Q_INVOKABLE int findIndex(const QVariant& value) const;
+    void add(QVariant&& text, QVariant&& value, QVariant&& image = QVariant());
+    void clear();
+    void SetData(container_type data);
+
+  protected:
+    virtual QHash<int, QByteArray> roleNames() const override;
+
+  private:
+    std::vector<BasicQMLModelItemData> m_data;
+  };
 }
 
 Q_DECLARE_METATYPE(vol2com::BasicQMLModel*)
-
-#endif // BASICQMLMODEL_H
