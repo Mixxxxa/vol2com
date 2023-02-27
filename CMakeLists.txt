@@ -19,6 +19,7 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
 # Includes
 ################################################################################
 include(FetchContent)
+include(cmake/gitinfo.cmake)
 
 ################################################################################
 # Libraries
