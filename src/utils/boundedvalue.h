@@ -19,8 +19,7 @@
 **
 ****************************************************************************/
 
-#ifndef BOUNDEDVALUE_H
-#define BOUNDEDVALUE_H
+#pragma once
 
 #include <QObject>
 
@@ -28,6 +27,7 @@ namespace vol2com
 {
   /*!
    * @brief Helper class to implement bounded (min,max) value with signals
+   * @todo Support corner cases (signed overflow, etc...)
    */
   class BoundedValue : public QObject
   {
@@ -37,33 +37,52 @@ namespace vol2com
     Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
 
   public:
-    BoundedValue(int min, int max, int value, QObject* parent = nullptr);
-    BoundedValue& operator=(int other);
-    BoundedValue& operator+=(int other);
-    BoundedValue& operator-=(int other);
-    int& operator++();
-    int operator++(int);
-    int& operator--();
-    int operator--(int);
+    using value_type = int;
 
-    int min() const;
-    int max() const;
-    int value() const;
+    /*!
+     * @brief Overflow behavior. See each entry for details
+     */
+    enum class EOverflowBehavior
+    {
+        Overflow /*!<
+                   If the value exceeds the boundary, it is safely overflows.
+                   Example (0-min, 10-max): 8 + 5 -> 2
+                 */
+      , Clamp    /*!<
+                   If the value exceeds the boundary, it becomes equal
+                   to the nearest boundary.
+                   Example (0-min, 10-max): 8 + 4 -> 10
+                 */
+    };
+
+    BoundedValue(value_type min, value_type max, value_type value,
+                 EOverflowBehavior behavior, QObject* parent = nullptr);
+
+    BoundedValue& operator= (value_type other);
+    BoundedValue& operator+=(value_type other);
+    BoundedValue& operator-=(value_type other);
+    value_type& operator++();
+    value_type  operator++(int);
+    value_type& operator--();
+    value_type  operator--(int);
+
+    value_type min() const;
+    value_type max() const;
+    value_type value() const;
+
+    bool InRange(value_type value) const;
+    EOverflowBehavior OverflowBehavior() const;
 
   public slots:
-    void setValue(int value);
+    void setValue(value_type value);
 
   signals:
-    void valueChanged(int value);
+    void valueChanged(value_type value);
 
   private:
-    int fitToBounds(int value) const;
-    bool inBounds(int value) const;
-
-    const int m_min;
-    const int m_max;
-    int m_value;
+    const value_type m_min;
+    const value_type m_max;
+    value_type m_value;
+    const EOverflowBehavior m_overflowBehavior;
   };
 }
-
-#endif // BOUNDEDVALUE_H

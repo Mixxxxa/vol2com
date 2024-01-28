@@ -23,78 +23,94 @@
 ****************************************************************************/
 
 #include "boundedvalue.h"
+#include <algorithm>
+#include <utility>
 
 namespace vol2com
 {
-  BoundedValue::BoundedValue(int min, int max, int value, QObject* parent)
-    : QObject{ parent }
-    , m_min  { min    }
-    , m_max  { max    }
-    , m_value{ value  }
+  BoundedValue::BoundedValue(value_type min, value_type max, value_type value,
+                             EOverflowBehavior behavior, QObject* parent)
+    : QObject           { parent   }
+    , m_min             { min      }
+    , m_max             { max      }
+    , m_value           { value    }
+    , m_overflowBehavior{ behavior }
   {
-    Q_ASSERT((value >= m_min) && (value <= m_max));
+    Q_ASSERT(min < max);
+    Q_ASSERT(InRange(value));
   }
 
-  BoundedValue &BoundedValue::operator=(int other)
+  BoundedValue &BoundedValue::operator=(value_type other)
   {
     setValue(other);
     return *this;
   }
 
-  int BoundedValue::value() const
-  {
-    return m_value;
-  }
-
-  BoundedValue& BoundedValue::operator+=(int other)
+  BoundedValue& BoundedValue::operator+=(value_type other)
   {
     setValue(m_value + other);
     return *this;
   }
 
-  BoundedValue &BoundedValue::operator -=(int other)
+  BoundedValue &BoundedValue::operator -=(value_type other)
   {
     setValue(m_value - other);
     return *this;
   }
 
-  int &BoundedValue::operator++()
+  BoundedValue::value_type &BoundedValue::operator ++()
   {
     setValue(m_value + 1);
     return m_value;
   }
 
-  int BoundedValue::operator++(int)
+  BoundedValue::value_type BoundedValue::operator++(int)
   {
     auto value = m_value;
     setValue(m_value + 1);
     return value;
   }
 
-  int &BoundedValue::operator--()
+  BoundedValue::value_type &BoundedValue::operator--()
   {
     setValue(m_value - 1);
     return m_value;
   }
 
-  int BoundedValue::operator--(int)
+  BoundedValue::value_type BoundedValue::operator--(int)
   {
     auto value = m_value;
     setValue(m_value - 1);
     return value;
   }
 
-  int BoundedValue::min() const
+  BoundedValue::value_type BoundedValue::min() const
   {
     return m_min;
   }
 
-  int BoundedValue::max() const
+  BoundedValue::value_type BoundedValue::max() const
   {
     return m_max;
   }
 
-  void BoundedValue::setValue(int value)
+  BoundedValue::value_type BoundedValue::value() const
+  {
+    return m_value;
+  }
+
+  bool BoundedValue::InRange(value_type value) const
+  {
+    return std::cmp_greater_equal(value, min())
+        && std::cmp_less_equal(value, max());
+  }
+
+  BoundedValue::EOverflowBehavior BoundedValue::OverflowBehavior() const
+  {
+    return m_overflowBehavior;
+  }
+
+  void BoundedValue::setValue(BoundedValue::value_type value)
   {
     if (m_value == value)
     {
@@ -103,35 +119,26 @@ namespace vol2com
 
     const auto oldValue = m_value;
 
-    if(inBounds(value))
+    if(m_overflowBehavior == EOverflowBehavior::Clamp)
     {
-      m_value = value;
+      m_value = std::clamp(value, min(), max());
     }
-    else
+    else if (m_overflowBehavior == EOverflowBehavior::Overflow)
     {
-      m_value = fitToBounds(value);
+      if(value >= 0)
+      {
+        m_value = value % (m_max + 1);
+      }
+      else
+      {
+        const auto max = this->max();
+        m_value = max - std::abs(value) % (max + 1) + 1;
+      }
     }
 
     if(m_value != oldValue)
     {
       emit valueChanged(m_value);
     }
-  }
-
-  int BoundedValue::fitToBounds(int value) const
-  {
-    if(value >= 0)
-    {
-      return value % (m_max + 1);
-    }
-    else
-    {
-      return m_max - std::abs(value) % (m_max+1) + 1;
-    }
-  }
-
-  bool BoundedValue::inBounds(int value) const
-  {
-    return ((value >= m_min) && (value <= m_max));
   }
 }

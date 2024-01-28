@@ -34,8 +34,8 @@ WorkModeWithSelector::WorkModeWithSelector(QObject *parent)
   , m_bassLib       { Controller::getInstance().bassLib() }
   , m_eq            { Controller::getInstance().equalizer() }
   , m_timer         { new QTimer(this) }
-  , m_uprate        { 1, 120, 40 }
-  , m_selectedBand  { 0, BassLibWrapper::AvailableBands - 1, 0 }
+  , m_uprate        { 1, 120, 40, BoundedValue::EOverflowBehavior::Clamp }
+  , m_selectedBand  { 0, BassLibWrapper::AvailableBands - 1, 0, BoundedValue::EOverflowBehavior::Clamp }
   , m_showBackground{ true }
   , m_barsStyle     { AbstractBandViewer::BarsStyle::AllPainted }
   , m_colorSource   { AbstractBandViewer::ColorSource::Default }

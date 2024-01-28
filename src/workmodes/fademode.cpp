@@ -26,19 +26,20 @@
 #include "basslibwrapper.h"
 #include "equalizer.h"
 #include "settings.h"
+#include "utils/boundedvalue.h"
 #include "utils/math.hpp"
 #include <QByteArray>
 
 namespace
 {
-    static constexpr auto KeyHue = "Hue";
+  static constexpr auto KeyHue = "Hue";
 }
 
 using namespace vol2com;
 
-FadeMode::FadeMode(QObject *parent) :
-    WorkModeWithSelector(parent),
-    m_hue(0, 359, 0)
+FadeMode::FadeMode(QObject *parent)
+  : WorkModeWithSelector(parent)
+  , m_hue(0, 359, 0, BoundedValue::EOverflowBehavior::Clamp)
 {
 }
 
@@ -65,27 +66,27 @@ BoundedValue *FadeMode::hue()
 void FadeMode::process()
 {
   constexpr auto ArraySize = 4;
-    const auto data = m_bassLib->band(m_selectedBand.value());
+  const auto data = m_bassLib->band(m_selectedBand.value());
 
-    QByteArray bytes;
-    bytes.resize(ArraySize);
-    bytes[0] = 'm';
-    bytes[1] = static_cast<char>(remap<int>(m_hue.value(), m_hue.min(), m_hue.max(), 0, 255));
-    bytes[2] = static_cast<char>(0xFF);
-    bytes[3] = static_cast<char>(m_eq->processValue(m_selectedBand.value(), data));
-    emit dataReady(bytes);
+  QByteArray bytes;
+  bytes.resize(ArraySize);
+  bytes[0] = 'm';
+  bytes[1] = static_cast<char>(remap<int>(m_hue.value(), m_hue.min(), m_hue.max(), 0, 255));
+  bytes[2] = static_cast<char>(0xFF);
+  bytes[3] = static_cast<char>(m_eq->processValue(m_selectedBand.value(), data));
+  emit dataReady(bytes);
 }
 
 void FadeMode::save()
 {
-    WorkModeWithSelector::save();
-    auto& settings = Settings::getInstance();
-    settings.set(name(), QString(::KeyHue), m_hue.value());
+  WorkModeWithSelector::save();
+  auto& settings = Settings::getInstance();
+  settings.set(name(), QString(::KeyHue), m_hue.value());
 }
 
 void FadeMode::load()
 {
-    WorkModeWithSelector::load();
-    auto& settings = Settings::getInstance();
-    m_hue = settings.getInt(name(), QString(::KeyHue), m_hue.min(), m_hue.max(), 0);
+  WorkModeWithSelector::load();
+  auto& settings = Settings::getInstance();
+  m_hue = settings.getInt(name(), QString(::KeyHue), m_hue.min(), m_hue.max(), 0);
 }

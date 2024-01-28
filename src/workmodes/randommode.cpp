@@ -46,7 +46,7 @@ namespace vol2com
       , m_reverseTimer{ std::make_unique<QTimer>() }
       , m_rand        { std::random_device{}() }
       , m_reverse     { false }
-      , m_hue         { 0, 359, 0 }
+      , m_hue         { 0, 359, 0, BoundedValue::EOverflowBehavior::Overflow }
       , m_counter     { 0 }
     {
       m_reverseTimer->setTimerType(Qt::VeryCoarseTimer);
@@ -105,7 +105,7 @@ namespace vol2com
     , m_timer          { new QTimer(this) }
     , m_subModeInstance{ std::make_unique<RandomSubModeType1>() }
     , m_subMode        { RandomMode::SubMode::Type1 }
-    , m_uprate         { 1, 120, 60}
+    , m_uprate         { 1, 120, 60, BoundedValue::EOverflowBehavior::Clamp }
   {
     onSpeedValueChanged(m_uprate.value());
     QObject::connect(m_timer, &QTimer::timeout,
