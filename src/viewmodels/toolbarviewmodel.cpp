@@ -26,11 +26,11 @@
 
 namespace vol2com
 {
-ToolbarViewModel::ToolbarViewModel(QObject *parent) :
-    QObject(parent),
-    m_showStatus(false),
-    m_backarrowActive(false)
-{
+  ToolbarViewModel::ToolbarViewModel(QObject *parent)
+    : QObject(parent)
+    , m_showStatus(false)
+    , m_backarrowActive(false)
+  {
     auto& controller = Controller::getInstance();
     setPage(controller.page());
     onModeChanged(controller.mode());
@@ -41,46 +41,46 @@ ToolbarViewModel::ToolbarViewModel(QObject *parent) :
                      this, &ToolbarViewModel::onModeChanged);
     QObject::connect(this, &ToolbarViewModel::pageChanged,
                      this, &ToolbarViewModel::updateBackArrow);
-}
+  }
 
-void ToolbarViewModel::setPage(vol2com::Controller::Page page)
-{
+  void ToolbarViewModel::setPage(vol2com::Controller::Page page)
+  {
     if (m_page == page)
-        return;
+      return;
 
     m_page = page;
     emit pageChanged(m_page);
-}
+  }
 
-void ToolbarViewModel::setShowStatus(bool showStatus)
-{
+  void ToolbarViewModel::setShowStatus(bool showStatus)
+  {
     if (m_showStatus == showStatus)
-        return;
+      return;
 
     m_showStatus = showStatus;
     emit showStatusChanged(m_showStatus);
-}
+  }
 
-void ToolbarViewModel::setBackarrowActive(bool backarrowActive)
-{
+  void ToolbarViewModel::setBackarrowActive(bool backarrowActive)
+  {
     if (m_backarrowActive == backarrowActive)
-        return;
+      return;
 
     m_backarrowActive = backarrowActive;
     emit backarrowActiveChanged(m_backarrowActive);
-}
+  }
 
-void ToolbarViewModel::updateBackArrow()
-{
+  void ToolbarViewModel::updateBackArrow()
+  {
     bool active = (!m_workMode.expired()) && (m_page == Controller::Page::WorkModePage);
     setBackarrowActive(active);
-}
+  }
 
-void ToolbarViewModel::onModeChanged(std::shared_ptr<WorkModeBase> mode)
-{
+  void ToolbarViewModel::onModeChanged(std::shared_ptr<WorkModeBase> mode)
+  {
     m_workMode = mode;
     updateBackArrow();
-}
+  }
 }
 
 

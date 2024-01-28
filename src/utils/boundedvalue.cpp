@@ -23,88 +23,115 @@
 ****************************************************************************/
 
 #include "boundedvalue.h"
-#include <cassert>
-#include <algorithm>
 
-using namespace vol2com;
-
-BoundedValue::BoundedValue(int min, int max, int value, QObject* parent) :
-    QObject(parent),
-    m_min(min),
-    m_max(max),
-    m_value(value)
+namespace vol2com
 {
-    assert((value >= m_min) && (value <= m_max));
-}
+  BoundedValue::BoundedValue(int min, int max, int value, QObject* parent)
+    : QObject{ parent }
+    , m_min  { min    }
+    , m_max  { max    }
+    , m_value{ value  }
+  {
+    Q_ASSERT((value >= m_min) && (value <= m_max));
+  }
 
-BoundedValue &BoundedValue::operator=(const int &other)
-{
+  BoundedValue &BoundedValue::operator=(int other)
+  {
     setValue(other);
     return *this;
-}
+  }
 
-int BoundedValue::value() const
-{
+  int BoundedValue::value() const
+  {
     return m_value;
-}
+  }
 
-BoundedValue& BoundedValue::operator+=(const int &other)
-{
+  BoundedValue& BoundedValue::operator+=(int other)
+  {
     setValue(m_value + other);
     return *this;
-}
+  }
 
-BoundedValue &BoundedValue::operator -=(const int &other)
-{
+  BoundedValue &BoundedValue::operator -=(int other)
+  {
     setValue(m_value - other);
     return *this;
-}
+  }
 
-int &BoundedValue::operator++()
-{
+  int &BoundedValue::operator++()
+  {
     setValue(m_value + 1);
     return m_value;
-}
+  }
 
-int BoundedValue::operator++(int)
-{
+  int BoundedValue::operator++(int)
+  {
     auto value = m_value;
     setValue(m_value + 1);
     return value;
-}
+  }
 
-int &BoundedValue::operator--()
-{
+  int &BoundedValue::operator--()
+  {
     setValue(m_value - 1);
     return m_value;
-}
+  }
 
-int BoundedValue::operator--(int)
-{
+  int BoundedValue::operator--(int)
+  {
     auto value = m_value;
     setValue(m_value - 1);
     return value;
-}
+  }
 
-int BoundedValue::min() const
-{
+  int BoundedValue::min() const
+  {
     return m_min;
-}
+  }
 
-int BoundedValue::max() const
-{
+  int BoundedValue::max() const
+  {
     return m_max;
-}
+  }
 
-void BoundedValue::setValue(int value)
-{
+  void BoundedValue::setValue(int value)
+  {
     if (m_value == value)
-        return;
+    {
+      return;
+    }
+
+    const auto oldValue = m_value;
 
     if(inBounds(value))
-        m_value = value;
+    {
+      m_value = value;
+    }
     else
-        m_value = fitToBounds(value);
+    {
+      m_value = fitToBounds(value);
+    }
 
-    emit valueChanged(m_value);
+    if(m_value != oldValue)
+    {
+      emit valueChanged(m_value);
+    }
+  }
+
+  int BoundedValue::fitToBounds(int value) const
+  {
+    if(value >= 0)
+    {
+      return value % (m_max + 1);
+    }
+    else
+    {
+      return m_max - std::abs(value) % (m_max+1) + 1;
+    }
+  }
+
+  bool BoundedValue::inBounds(int value) const
+  {
+    return ((value >= m_min) && (value <= m_max));
+  }
 }

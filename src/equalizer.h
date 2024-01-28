@@ -44,7 +44,6 @@ namespace vol2com
         static constexpr EqualizerValue DefaultValue = 100;
 
         explicit Equalizer(QObject *parent = nullptr);
-        ~Equalizer();
 
         bool enabled() const;
         const EqualizerValue& overallAmplification() const;

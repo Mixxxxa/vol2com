@@ -26,51 +26,44 @@
 
 namespace vol2com
 {
-    class BoundedValue : public QObject
-    {
-        Q_OBJECT
-        Q_PROPERTY(int min READ min CONSTANT)
-        Q_PROPERTY(int max READ max CONSTANT)
-        Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
+  /*!
+   * @brief Helper class to implement bounded (min,max) value with signals
+   */
+  class BoundedValue : public QObject
+  {
+    Q_OBJECT
+    Q_PROPERTY(int min READ min CONSTANT)
+    Q_PROPERTY(int max READ max CONSTANT)
+    Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
 
-    public:
-        BoundedValue(int min, int max, int value, QObject* parent = nullptr);
-        BoundedValue& operator=(const int& other);
-        BoundedValue& operator+=(const int& other);
-        BoundedValue& operator-=(const int& other);
-        int& operator++();
-        int operator++(int);
-        int& operator--();
-        int operator--(int);
+  public:
+    BoundedValue(int min, int max, int value, QObject* parent = nullptr);
+    BoundedValue& operator=(int other);
+    BoundedValue& operator+=(int other);
+    BoundedValue& operator-=(int other);
+    int& operator++();
+    int operator++(int);
+    int& operator--();
+    int operator--(int);
 
-        int min() const;
-        int max() const;
-        int value() const;
+    int min() const;
+    int max() const;
+    int value() const;
 
-    public slots:
-        void setValue(int value);
+  public slots:
+    void setValue(int value);
 
-    signals:
-        void valueChanged(int value);
+  signals:
+    void valueChanged(int value);
 
-    private:
-        inline int fitToBounds(int value) const
-        {
-            if(value >= 0)
-                return value % (m_max + 1);
-            else
-                return m_max - std::abs(value) % (m_max+1) + 1;
-        }
+  private:
+    int fitToBounds(int value) const;
+    bool inBounds(int value) const;
 
-        inline bool inBounds(int value) const
-        {
-            return ((value >= m_min) && (value <= m_max));
-        }
-
-        const int m_min;
-        const int m_max;
-        int m_value;
-    };
+    const int m_min;
+    const int m_max;
+    int m_value;
+  };
 }
 
 #endif // BOUNDEDVALUE_H

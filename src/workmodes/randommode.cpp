@@ -107,7 +107,6 @@ namespace vol2com
     , m_subMode        { RandomMode::SubMode::Type1 }
     , m_uprate         { 1, 120, 60}
   {
-    load();
     onSpeedValueChanged(m_uprate.value());
     QObject::connect(m_timer, &QTimer::timeout,
                         this, &RandomMode::process);
@@ -115,10 +114,7 @@ namespace vol2com
                           this, &RandomMode::onSpeedValueChanged);
   }
 
-  RandomMode::~RandomMode()
-  {
-    save();
-  }
+  RandomMode::~RandomMode() = default;
 
   void RandomMode::start()
   {
@@ -163,9 +159,13 @@ namespace vol2com
 
   void RandomMode::load()
   {
-    const auto& settings = Settings::getInstance();
-    m_subMode = settings.getEnum(name(), SettingsKeys::SubMode, RandomMode::SubMode::Type1);
-    m_uprate = settings.getInt(name(), SettingsKeys::SpeedLevel, m_uprate.min(), m_uprate.max(), 60);
+    const auto &s = Settings::getInstance();
+
+    const auto subMode = s.getEnum(name(), SettingsKeys::SubMode, RandomMode::SubMode::Type1);
+    setSubMode(subMode);
+
+    const auto uprate = s.getInt(name(), SettingsKeys::SpeedLevel, m_uprate.min(), m_uprate.max(), 60);
+    m_uprate.setValue(uprate);
   }
 
   void RandomMode::setSubMode(RandomMode::SubMode subMode)

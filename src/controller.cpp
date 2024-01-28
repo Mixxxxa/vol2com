@@ -57,6 +57,7 @@ Controller::Controller(QObject *parent)
   , m_equalizer { std::make_shared<Equalizer>() }
   , m_factory   { std::make_shared<WorkModesFactory>() }
 {
+  m_connector->load();
   m_equalizer->load();
 
 
@@ -121,12 +122,18 @@ void Controller::deInit()
   if(m_engine)
     m_engine = nullptr;
   if(m_mode)
+  {
+    m_mode->save();
     m_mode = nullptr;
+  }
   if(m_connector)
+  {
+    m_connector->save();
     m_connector = nullptr;
+  }
   if(m_equalizer)
   {
-
+    m_equalizer->save();
     m_equalizer = nullptr;
   }
 
@@ -229,12 +236,9 @@ void Controller::closeUI()
     m_mainWindow = nullptr;
   }
 
-  if(m_engine)
-  {
-    m_engine->collectGarbage();
-    m_engine->clearComponentCache();
-    qGuiApp->processEvents();
-  }
+  m_engine->collectGarbage();
+  m_engine->clearComponentCache();
+  qGuiApp->processEvents();
 }
 
 void Controller::exit()
@@ -283,22 +287,27 @@ void Controller::setMode(const QString& modename)
   if(m_mode)
   {
     if(m_mode->name() == modename)
+    {
       return;
+    }
 
     m_mode->stop();
     m_mode->disconnect();
   }
 
   m_mode = m_factory->create(modename);
-  if(m_mode != nullptr)
+  if(m_mode)
   {
+    m_mode->load();
     if(m_connector)
     {
-      QObject::connect(m_mode.get(), &WorkModeBase::dataReady,
+      QObject::connect(     m_mode.get(), &WorkModeBase::dataReady,
                        m_connector.get(), &ConnectMethodBase::write);
 
       if(m_connector->state() == ConnectMethodBase::State::Connected)
+      {
         m_mode->start();
+      }
     }
   }
   else

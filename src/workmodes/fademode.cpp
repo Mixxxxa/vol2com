@@ -36,26 +36,35 @@ namespace
 
 using namespace vol2com;
 
-FadeMode::FadeMode() :
-    WorkModeWithSelector(),
+FadeMode::FadeMode(QObject *parent) :
+    WorkModeWithSelector(parent),
     m_hue(0, 359, 0)
 {
-    load();
 }
 
-FadeMode::~FadeMode()
+QString FadeMode::name() const
 {
-    save();
+  return QStringLiteral("Fade");
+}
+
+QString FadeMode::qmlDelegate() const
+{
+  return WorkModeBase::qmlDelegatesPath() + QStringLiteral("FadeMode.qml");
 }
 
 QColor FadeMode::getGuiColor(uint8_t value) const
 {
-    return QColor::fromHsv(m_hue.value(), 255, value);
+  return QColor::fromHsv(m_hue.value(), 255, value);
+}
+
+BoundedValue *FadeMode::hue()
+{
+  return &m_hue;
 }
 
 void FadeMode::process()
 {
-    constexpr auto ArraySize = 4;
+  constexpr auto ArraySize = 4;
     const auto data = m_bassLib->band(m_selectedBand.value());
 
     QByteArray bytes;

@@ -53,13 +53,11 @@ namespace vol2com
     , m_worker(nullptr)
   {
     updateSerialPorts();
-    load();
     setState(State::Idle);
   }
 
   SerialConnector::~SerialConnector()
   {
-    save();
     stop();
   }
 
@@ -192,10 +190,11 @@ namespace vol2com
     BasicQMLModel::container_type newPorts;
     for(const auto &port : QSerialPortInfo::availablePorts())
     {
-      newPorts.push_back({
-                           .text = u"%1 - %2"_s.arg(port.portName(), port.description()),
-                           .value = port.portName()
-                         });
+      newPorts.emplace_back(
+        BasicQMLModel::container_type::value_type{
+          .text = u"%1 - %2"_s.arg(port.portName(), port.description()),
+          .value = port.portName()
+      });
     }
     m_portsModel->SetData(newPorts);
   }
@@ -214,27 +213,27 @@ namespace vol2com
 
   void SerialConnector::load()
   {
-    auto& settings = Settings::getInstance();
+    const auto& settings = Settings::getInstance();
 
     const auto port = settings.get(QString(::Name), SettingsKeys::Port, SerialConnector::UnknownPort).toString();
     if(isPortNameCorrect(port) && isPortAvailable(port))
     {
-      m_port = port;
+      setPort(port);
     }
     else if (m_portsModel->rowCount() > 0)
     {
-      m_port = m_portsModel->data(m_portsModel->index(0), BasicQMLModel::ValueRole).toString();
+      setPort(m_portsModel->data(m_portsModel->index(0), BasicQMLModel::ValueRole).toString());
     }
     else
     {
-      m_port = SerialConnector::UnknownPort;
+      setPort(SerialConnector::UnknownPort);
     }
 
-    m_baudrate = settings.getEnum(QString(::Name), SettingsKeys::Baudrate, SerialConnector::BaudRate::Baud57600);
-    m_dataBits = settings.getEnum(QString(::Name), SettingsKeys::Databits, SerialConnector::DataBits::Data8);
-    m_parity = settings.getEnum(QString(::Name), SettingsKeys::Parity, SerialConnector::Parity::NoParity);
-    m_stopBits = settings.getEnum(QString(::Name), SettingsKeys::StopBits, SerialConnector::StopBits::OneStop);
-    m_flowControl = settings.getEnum(QString(::Name), SettingsKeys::FlowControl, SerialConnector::FlowControl::NoFlowControl);
+    m_baudrate      = settings.getEnum(QString(::Name), SettingsKeys::Baudrate, SerialConnector::BaudRate::Baud57600);
+    m_dataBits      = settings.getEnum(QString(::Name), SettingsKeys::Databits, SerialConnector::DataBits::Data8);
+    m_parity        = settings.getEnum(QString(::Name), SettingsKeys::Parity, SerialConnector::Parity::NoParity);
+    m_stopBits      = settings.getEnum(QString(::Name), SettingsKeys::StopBits, SerialConnector::StopBits::OneStop);
+    m_flowControl   = settings.getEnum(QString(::Name), SettingsKeys::FlowControl, SerialConnector::FlowControl::NoFlowControl);
     m_autoReconnect = settings.get(QString(::Name), SettingsKeys::AutoReconnect, true).toBool();
   }
 

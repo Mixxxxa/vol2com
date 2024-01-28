@@ -100,7 +100,7 @@ void WorkModeViewModel::setMode(std::shared_ptr<WorkModeBase> mode)
     if (m_currentMode == mode)
         return;
 
-    m_currentMode = mode;
+    m_currentMode = mode; //-V820
     emit currentModeChanged(m_currentMode.get());
 }
 

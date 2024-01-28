@@ -28,89 +28,85 @@
 
 using namespace vol2com;
 
-ManualMode::ManualMode() :
-    m_hue(0, 359, 0),
-    m_saturation(0, 255, 255),
-    m_value(0, 255, 255)
+ManualMode::ManualMode(QObject *parent)
+  : WorkModeBase{ parent }
+  , m_hue(0, 359, 0)
+  , m_saturation(0, 255, 255)
+  , m_value(0, 255, 255)
 {
-    load();
-    m_color.setHsv(m_hue.value(), m_saturation.value(), m_value.value());
-    m_refColor.setHsv(m_hue.value(), 255, 255);
-    QObject::connect(&m_hue, &BoundedValue::valueChanged,
-                     this, &ManualMode::onHsvChanged);
-    QObject::connect(&m_saturation, &BoundedValue::valueChanged,
-                     this, &ManualMode::onHsvChanged);
-    QObject::connect(&m_value, &BoundedValue::valueChanged,
-                     this, &ManualMode::onHsvChanged);
-}
-
-ManualMode::~ManualMode()
-{
-    save();
+  m_color.setHsv(m_hue.value(), m_saturation.value(), m_value.value());
+  m_refColor.setHsv(m_hue.value(), 255, 255);
+  QObject::connect(&m_hue, &BoundedValue::valueChanged,
+                   this, &ManualMode::onHsvChanged);
+  QObject::connect(&m_saturation, &BoundedValue::valueChanged,
+                   this, &ManualMode::onHsvChanged);
+  QObject::connect(&m_value, &BoundedValue::valueChanged,
+                   this, &ManualMode::onHsvChanged);
 }
 
 void ManualMode::start()
 {
-    //Send current color
-    process();
+  //Send current color
+  process();
 }
 
 void ManualMode::process()
 {
-    constexpr auto ArraySize = 4;
+  constexpr auto ArraySize = 4;
 
-    QByteArray bytes;
-    bytes.resize(ArraySize);
-    bytes[0] = 'm';
-    bytes[1] = static_cast<char>(remap<int>(m_hue.value(), 0, 359, 0, 255));
-    bytes[2] = static_cast<char>(m_saturation.value());
-    bytes[3] = static_cast<char>(m_value.value());
-    emit dataReady(bytes);
+  QByteArray bytes;
+  bytes.resize(ArraySize);
+  bytes[0] = 'm';
+  bytes[1] = static_cast<char>(remap<int>(m_hue.value(), 0, 359, 0, 255));
+  bytes[2] = static_cast<char>(m_saturation.value());
+  bytes[3] = static_cast<char>(m_value.value());
+  emit dataReady(bytes);
 }
 
 void ManualMode::save()
 {
-    auto& settings = Settings::getInstance();
-    settings.set(name(), SettingsKeys::Hue, m_hue.value());
-    settings.set(name(), SettingsKeys::Saturation, m_saturation.value());
-    settings.set(name(), SettingsKeys::Value, m_value.value());
+  auto& settings = Settings::getInstance();
+  settings.set(name(), SettingsKeys::Hue, m_hue.value());
+  settings.set(name(), SettingsKeys::Saturation, m_saturation.value());
+  settings.set(name(), SettingsKeys::Value, m_value.value());
 }
 
 void ManualMode::load()
 {
-    auto& settings = Settings::getInstance();
-    m_hue        = settings.getInt(name(), SettingsKeys::Hue, m_hue.min(), m_hue.max(), 0);
-    m_saturation = settings.getInt(name(), SettingsKeys::Saturation, m_saturation.min(), m_saturation.max(), 255);
-    m_value      = settings.getInt(name(), SettingsKeys::Value, m_value.min(), m_value.max(), 255);
+  auto& settings = Settings::getInstance();
+  m_hue        = settings.getInt(name(), SettingsKeys::Hue, m_hue.min(), m_hue.max(), 0);
+  m_saturation = settings.getInt(name(), SettingsKeys::Saturation, m_saturation.min(), m_saturation.max(), 255);
+  m_value      = settings.getInt(name(), SettingsKeys::Value, m_value.min(), m_value.max(), 255);
+  onHsvChanged();
 }
 
 void ManualMode::setColor(const QColor &newColor)
 {
-    if (m_color == newColor)
-        return;
+  if (m_color == newColor)
+    return;
 
-    m_hue = newColor.hue();
-    m_saturation = newColor.saturation();
-    m_value = newColor.value();
+  m_hue = newColor.hue();
+  m_saturation = newColor.saturation();
+  m_value = newColor.value();
 }
 
 void ManualMode::setRefColor(const QColor &refColor)
 {
-    if (m_refColor == refColor)
-        return;
+  if (m_refColor == refColor)
+    return;
 
-    m_refColor = refColor;
-    emit refColorChanged(m_refColor);
+  m_refColor = refColor;
+  emit refColorChanged(m_refColor);
 }
 
 void ManualMode::onHsvChanged()
 {
-    m_color.setHsv(m_hue.value(), m_saturation.value(), m_value.value());
-    emit colorChanged(m_color);
-    process();
+  m_color.setHsv(m_hue.value(), m_saturation.value(), m_value.value());
+  emit colorChanged(m_color);
+  process();
 }
 
 void ManualMode::onHueChanged()
 {
-    setRefColor(QColor::fromHsv(m_hue.value(), 255, 255));
+  setRefColor(QColor::fromHsv(m_hue.value(), 255, 255));
 }

@@ -36,15 +36,12 @@ namespace vol2com
     Q_PROPERTY(QString qmlDelegate READ qmlDelegate CONSTANT)
 
   public:
+    using V2CBase::V2CBase;
+
     static QString qmlDelegatesPath()
     {
       return QStringLiteral("qrc:/qt/qml/vol2com/qml/");
     }
-
-    explicit WorkModeBase(QObject* parent = nullptr):
-      V2CBase(parent)
-    { }
-    virtual ~WorkModeBase() = default;
 
     virtual QString name() const = 0;
     virtual QString qmlDelegate() const = 0;

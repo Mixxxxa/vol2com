@@ -30,62 +30,63 @@ class QTimer;
 
 namespace vol2com
 {
-    class SubModeBase;
+  class SubModeBase;
 
-    class RandomMode : public WorkModeBase
+  class RandomMode : public WorkModeBase
+  {
+    Q_OBJECT
+    Q_PROPERTY(vol2com::RandomMode::SubMode subMode READ subMode WRITE setSubMode NOTIFY subModeChanged)
+    Q_PROPERTY(vol2com::BoundedValue* uprate READ uprate CONSTANT)
+
+  public:
+    ~RandomMode();
+
+    enum class SettingsKeys
     {
-        Q_OBJECT
-        Q_PROPERTY(vol2com::RandomMode::SubMode subMode READ subMode WRITE setSubMode NOTIFY subModeChanged)
-        Q_PROPERTY(vol2com::BoundedValue* uprate READ uprate CONSTANT)
-
-    public:
-        enum class SettingsKeys
-        {
-            SubMode,
-            SpeedLevel
-        };
-        Q_ENUM(SettingsKeys)
-
-        enum class SubMode
-        {
-            Type1,
-            Type2
-        };
-        Q_ENUM(SubMode);
-
-        explicit RandomMode(QObject *parent = nullptr);
-        ~RandomMode();
-
-        virtual QString name() const override
-        {
-            return QStringLiteral("Random");
-        }
-        virtual QString qmlDelegate() const override
-        {
-            return WorkModeBase::qmlDelegatesPath() + QStringLiteral("RandomMode.qml");
-        }
-
-        RandomMode::SubMode subMode() const { return m_subMode; }
-        vol2com::BoundedValue* uprate() { return &m_uprate; }
-
-    public slots:
-        virtual void start() override;
-        virtual void stop() override;
-        virtual void process() override;
-        virtual void save() override;
-        virtual void load() override;
-        void setSubMode(RandomMode::SubMode subMode);
-        void onSpeedValueChanged(int value);
-
-    signals:
-        void subModeChanged(RandomMode::SubMode subMode);
-
-    private:
-        QTimer* m_timer;
-        std::unique_ptr<SubModeBase> m_subModeInstance;
-        RandomMode::SubMode m_subMode;
-        BoundedValue m_uprate;
+      SubMode,
+      SpeedLevel
     };
+    Q_ENUM(SettingsKeys)
+
+    enum class SubMode
+    {
+      Type1,
+      Type2
+    };
+    Q_ENUM(SubMode);
+
+    explicit RandomMode(QObject *parent = nullptr);
+
+    virtual QString name() const override
+    {
+      return QStringLiteral("Random");
+    }
+    virtual QString qmlDelegate() const override
+    {
+      return WorkModeBase::qmlDelegatesPath() + QStringLiteral("RandomMode.qml");
+    }
+
+    RandomMode::SubMode subMode() const { return m_subMode; }
+    vol2com::BoundedValue* uprate() { return &m_uprate; }
+
+  public slots:
+    virtual void start() override;
+    virtual void stop() override;
+    virtual void process() override;
+    virtual void save() override;
+    virtual void load() override;
+    void setSubMode(RandomMode::SubMode subMode);
+    void onSpeedValueChanged(int value);
+
+  signals:
+    void subModeChanged(RandomMode::SubMode subMode);
+
+  private:
+    QTimer* m_timer;
+    std::unique_ptr<SubModeBase> m_subModeInstance;
+    RandomMode::SubMode m_subMode;
+    BoundedValue m_uprate;
+  };
 }
 
 #endif // RANDOMMODE_H

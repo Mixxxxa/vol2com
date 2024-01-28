@@ -30,15 +30,9 @@
 
 using namespace vol2com;
 
-GeneralMode::GeneralMode() :
-    WorkModeWithSelector()
+GeneralMode::GeneralMode(QObject *parent)
+  : WorkModeWithSelector(parent)
 {
-    load();
-}
-
-GeneralMode::~GeneralMode()
-{
-    save();
 }
 
 QColor GeneralMode::getGuiColor(uint8_t value) const

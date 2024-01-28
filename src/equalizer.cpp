@@ -50,11 +50,6 @@ Equalizer::Equalizer(QObject *parent) :
   setSaveTimeout(10s);
 }
 
-Equalizer::~Equalizer()
-{
-  save();
-}
-
 const Equalizer::EqualizerValue& Equalizer::get(int band) const
 {
   Q_ASSERT(band >= 0);
@@ -150,18 +145,21 @@ void Equalizer::save()
 void Equalizer::load()
 {
   auto& settings = Settings::getInstance();
-  
-  m_enabled = settings.get(QString(::SectionEqualizer), QString(::KeyEnabled), true).toBool();
-  // TODO Rework
-  m_overallAmplification = static_cast<unsigned>(settings.getInt(QString(::SectionEqualizer),
-                                                                 QString(::KeyOverall),
-                                                                 MinimumValue, MaximumValue, DefaultValue));
+
+  const auto enabled = settings.get(QString(::SectionEqualizer), QString(::KeyEnabled), true).toBool();
+  setEnabled(enabled);
+
+  const auto overallAmplification = static_cast<unsigned>(settings.getInt(QString(::SectionEqualizer),
+                                                                          QString(::KeyOverall),
+                                                                          MinimumValue, MaximumValue, DefaultValue));
+  setOverallAmplification(overallAmplification);
   
   for(size_t i = 0; i < m_values.size(); ++i)
   {
-    m_values[i] = static_cast<unsigned>(settings.getInt(QString(::SectionEqualizer),
-                                                        QString(::KeyBandPlaceholder).arg(i),
-                                                        MinimumValue, MaximumValue, DefaultValue));
+    const auto value = static_cast<unsigned>(settings.getInt(QString(::SectionEqualizer),
+                                                             QString(::KeyBandPlaceholder).arg(i),
+                                                             MinimumValue, MaximumValue, DefaultValue));
+    set(static_cast<int>(i), value);
   }
 }
 

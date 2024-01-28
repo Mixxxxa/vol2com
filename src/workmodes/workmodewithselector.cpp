@@ -29,110 +29,117 @@
 
 using namespace vol2com;
 
-WorkModeWithSelector::WorkModeWithSelector():
-    WorkModeBase(),
-    m_bassLib(Controller::getInstance().bassLib()),
-    m_eq(Controller::getInstance().equalizer()),
-    m_timer(new QTimer(this)),
-    m_uprate(1, 120, 40),
-    m_selectedBand(0, BassLibWrapper::AvailableBands - 1, 0),
-    m_showBackground(true),
-    m_barsStyle(AbstractBandViewer::BarsStyle::AllPainted),
-    m_colorSource(AbstractBandViewer::ColorSource::Default)
+WorkModeWithSelector::WorkModeWithSelector(QObject *parent)
+  : WorkModeBase    { parent }
+  , m_bassLib       { Controller::getInstance().bassLib() }
+  , m_eq            { Controller::getInstance().equalizer() }
+  , m_timer         { new QTimer(this) }
+  , m_uprate        { 1, 120, 40 }
+  , m_selectedBand  { 0, BassLibWrapper::AvailableBands - 1, 0 }
+  , m_showBackground{ true }
+  , m_barsStyle     { AbstractBandViewer::BarsStyle::AllPainted }
+  , m_colorSource   { AbstractBandViewer::ColorSource::Default }
 {
-    QObject::connect(&m_uprate, &BoundedValue::valueChanged,
-                     this, &WorkModeWithSelector::scheduleSave);
-    QObject::connect(&m_uprate, &BoundedValue::valueChanged,
-                     this, &WorkModeWithSelector::onUpdadeRateChanged);
-    QObject::connect(&m_selectedBand, &BoundedValue::valueChanged,
-                     this, &WorkModeWithSelector::scheduleSave);
-    QObject::connect(this, &WorkModeWithSelector::showBackgroundChanged,
-                     this, &WorkModeWithSelector::scheduleSave);
-    QObject::connect(this, &WorkModeWithSelector::barsStyleChanged,
-                     this, &WorkModeWithSelector::scheduleSave);
-    QObject::connect(this, &WorkModeWithSelector::colorSourceChanged,
-                     this, &WorkModeWithSelector::scheduleSave);
+  QObject::connect(&m_uprate, &BoundedValue::valueChanged,
+                   this, &WorkModeWithSelector::scheduleSave);
+  QObject::connect(&m_uprate, &BoundedValue::valueChanged,
+                   this, &WorkModeWithSelector::onUpdadeRateChanged);
+  QObject::connect(&m_selectedBand, &BoundedValue::valueChanged,
+                   this, &WorkModeWithSelector::scheduleSave);
+  QObject::connect(this, &WorkModeWithSelector::showBackgroundChanged,
+                   this, &WorkModeWithSelector::scheduleSave);
+  QObject::connect(this, &WorkModeWithSelector::barsStyleChanged,
+                   this, &WorkModeWithSelector::scheduleSave);
+  QObject::connect(this, &WorkModeWithSelector::colorSourceChanged,
+                   this, &WorkModeWithSelector::scheduleSave);
 
-    m_timer->setInterval(1000 / m_uprate.value());
-    QObject::connect(m_timer, &QTimer::timeout,
-                     this, &WorkModeWithSelector::process);
-}
-
-WorkModeWithSelector::~WorkModeWithSelector()
-{
-    stop();
+  m_timer->setInterval(1000 / m_uprate.value());
+  QObject::connect(m_timer, &QTimer::timeout,
+                   this, &WorkModeWithSelector::process);
 }
 
 void WorkModeWithSelector::start()
 {
-    qDebug() << "void WorkModeWithSelector::start()";
-    if(m_bassLib->state() != BassLibWrapper::State::Active)
-        m_bassLib->start();
+  qDebug() << "void WorkModeWithSelector::start()";
+  if(m_bassLib->state() != BassLibWrapper::State::Active)
+  {
+    m_bassLib->start();
+  }
 
-    if(m_timer && !m_timer->isActive())
-        m_timer->start();
+  if(m_timer && !m_timer->isActive())
+  {
+    m_timer->start();
+  }
 }
 
 void WorkModeWithSelector::stop()
 {
-    qDebug() << "void WorkModeWithSelector::stop()";
-    if(m_timer && m_timer->isActive())
-        m_timer->stop();
+  qDebug() << "void WorkModeWithSelector::stop()";
+  if(m_timer && m_timer->isActive())
+  {
+    m_timer->stop();
+  }
 }
 
 void WorkModeWithSelector::save()
 {
-    auto& settings = Settings::getInstance();
-    settings.set(name(), SettingsKeys::UpdateRate, m_uprate.value());
-    settings.set(name(), SettingsKeys::SelectedBand, m_selectedBand.value());
-    settings.set(name(), SettingsKeys::ShowBackground, m_showBackground);
-    settings.set(name(), SettingsKeys::BarsStyle, static_cast<int>(m_barsStyle));
-    settings.set(name(), SettingsKeys::ColorSource, static_cast<int>(m_colorSource));
+  auto& settings = Settings::getInstance();
+  settings.set(name(), SettingsKeys::UpdateRate, m_uprate.value());
+  settings.set(name(), SettingsKeys::SelectedBand, m_selectedBand.value());
+  settings.set(name(), SettingsKeys::ShowBackground, m_showBackground);
+  settings.set(name(), SettingsKeys::BarsStyle, static_cast<int>(m_barsStyle));
+  settings.set(name(), SettingsKeys::ColorSource, static_cast<int>(m_colorSource));
 }
 
 void WorkModeWithSelector::load()
 {
-    auto& settings   = Settings::getInstance();
-    m_uprate         = settings.getInt(name(), SettingsKeys::UpdateRate, m_uprate.min(), m_uprate.max(), 40);
-    m_selectedBand   = settings.getInt(name(), SettingsKeys::SelectedBand, m_selectedBand.min(), m_selectedBand.max(), 0);
-    m_showBackground = settings.get(name(), SettingsKeys::ShowBackground, true).toBool();
-    m_barsStyle      = settings.getEnum(name(), SettingsKeys::BarsStyle, AbstractBandViewer::BarsStyle::AllPainted);
-    m_colorSource    = settings.getEnum(name(), SettingsKeys::ColorSource, AbstractBandViewer::ColorSource::Default);
+  auto& settings   = Settings::getInstance();
+  m_uprate         = settings.getInt(name(), SettingsKeys::UpdateRate, m_uprate.min(), m_uprate.max(), 40);
+  m_selectedBand   = settings.getInt(name(), SettingsKeys::SelectedBand, m_selectedBand.min(), m_selectedBand.max(), 0);
+
+  const auto showBackground = settings.get(name(), SettingsKeys::ShowBackground, true).toBool();
+  setShowBackground(showBackground);
+
+  const auto barsStyle = settings.getEnum(name(), SettingsKeys::BarsStyle, AbstractBandViewer::BarsStyle::AllPainted);
+  setBarsStyle(barsStyle);
+
+  const auto colorSource = settings.getEnum(name(), SettingsKeys::ColorSource, AbstractBandViewer::ColorSource::Default);
+  setColorSource(colorSource);
 }
 
 void WorkModeWithSelector::setShowBackground(bool showBackground)
 {
-    if (m_showBackground == showBackground)
-        return;
+  if (m_showBackground == showBackground)
+    return;
 
-    m_showBackground = showBackground;
-    emit showBackgroundChanged(m_showBackground);
+  m_showBackground = showBackground;
+  emit showBackgroundChanged(m_showBackground);
 }
 
 void WorkModeWithSelector::setBarsStyle(AbstractBandViewer::BarsStyle barsStyle)
 {
-    if (m_barsStyle == barsStyle)
-        return;
+  if (m_barsStyle == barsStyle)
+    return;
 
-    m_barsStyle = barsStyle;
-    emit barsStyleChanged(m_barsStyle);
+  m_barsStyle = barsStyle;
+  emit barsStyleChanged(m_barsStyle);
 }
 
 void WorkModeWithSelector::setColorSource(AbstractBandViewer::ColorSource colorSource)
 {
-    if (m_colorSource == colorSource)
-        return;
+  if (m_colorSource == colorSource)
+    return;
 
-    m_colorSource = colorSource;
-    emit colorSourceChanged(m_colorSource);
+  m_colorSource = colorSource;
+  emit colorSourceChanged(m_colorSource);
 }
 
 void WorkModeWithSelector::onUpdadeRateChanged(int value)
 {
-    if(m_timer && m_timer->isActive())
-    {
-        m_timer->stop();
-        m_timer->setInterval(1000 / value);
-        m_timer->start();
-    }
+  if(m_timer && m_timer->isActive())
+  {
+    m_timer->stop();
+    m_timer->setInterval(1000 / value);
+    m_timer->start();
+  }
 }

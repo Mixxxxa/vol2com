@@ -27,36 +27,27 @@
 
 namespace vol2com
 {
-    class FadeMode : public WorkModeWithSelector
-    {
-        Q_OBJECT
-        Q_PROPERTY(vol2com::BoundedValue* hue READ hue CONSTANT)
+  class FadeMode : public WorkModeWithSelector
+  {
+    Q_OBJECT
+    Q_PROPERTY(vol2com::BoundedValue* hue READ hue CONSTANT)
 
-    public:
-        explicit FadeMode();
-        ~FadeMode();
+  public:
+    explicit FadeMode(QObject *parent = nullptr);
 
-        virtual QString name() const override
-        {
-            return QStringLiteral("Fade");
-        }
+    virtual QString name() const override;
+    virtual QString qmlDelegate() const override;
+    virtual QColor getGuiColor(uint8_t value) const override;
+    BoundedValue *hue();
 
-        virtual QString qmlDelegate() const override
-        {
-            return WorkModeBase::qmlDelegatesPath() + QStringLiteral("FadeMode.qml");
-        }
+  public slots:
+    virtual void process() override;
+    virtual void save() override;
+    virtual void load() override;
 
-        virtual QColor getGuiColor(uint8_t value) const override;
-        vol2com::BoundedValue* hue() { return &m_hue; }
-
-    public slots:
-        virtual void process() override;
-        virtual void save() override;
-        virtual void load() override;
-
-    private:
-        vol2com::BoundedValue m_hue;
-    };
+  private:
+    vol2com::BoundedValue m_hue;
+  };
 }
 
 #endif // FADEMODE_H

@@ -33,74 +33,73 @@ class QTimer;
 
 namespace vol2com
 {
-    class BassLibWrapper;
-    class Equalizer;
+  class BassLibWrapper;
+  class Equalizer;
 
-    class WorkModeWithSelector : public WorkModeBase
+  class WorkModeWithSelector : public WorkModeBase
+  {
+    Q_OBJECT
+    Q_PROPERTY(vol2com::BoundedValue* uprate READ uprate CONSTANT)
+    Q_PROPERTY(vol2com::BoundedValue* selectedBand READ selectedBand CONSTANT)
+    Q_PROPERTY(bool showBackground READ showBackground WRITE setShowBackground NOTIFY showBackgroundChanged)
+    Q_PROPERTY(vol2com::AbstractBandViewer::BarsStyle barsStyle READ barsStyle WRITE setBarsStyle NOTIFY barsStyleChanged)
+    Q_PROPERTY(vol2com::AbstractBandViewer::ColorSource colorSource READ colorSource WRITE setColorSource NOTIFY colorSourceChanged)
+
+  public:
+    typedef std::function<QColor(const uint8_t&)> ColorFunc;
+
+    enum class SettingsKeys
     {
-        Q_OBJECT
-        Q_PROPERTY(vol2com::BoundedValue* uprate READ uprate CONSTANT)
-        Q_PROPERTY(vol2com::BoundedValue* selectedBand READ selectedBand CONSTANT)
-        Q_PROPERTY(bool showBackground READ showBackground WRITE setShowBackground NOTIFY showBackgroundChanged)
-        Q_PROPERTY(vol2com::AbstractBandViewer::BarsStyle barsStyle READ barsStyle WRITE setBarsStyle NOTIFY barsStyleChanged)
-        Q_PROPERTY(vol2com::AbstractBandViewer::ColorSource colorSource READ colorSource WRITE setColorSource NOTIFY colorSourceChanged)
-
-    public:
-        typedef std::function<QColor(const uint8_t&)> ColorFunc;
-
-        enum class SettingsKeys
-        {
-            UpdateRate,
-            SelectedBand,
-            ShowBackground,
-            BarsStyle,
-            ColorSource
-        };
-        Q_ENUM(SettingsKeys)
-
-        explicit WorkModeWithSelector();
-        virtual ~WorkModeWithSelector();
-
-        virtual QString name() const override =0;
-        virtual QString qmlDelegate() const override =0;
-        virtual QColor getGuiColor(uint8_t value) const =0;
-
-        vol2com::BoundedValue* uprate() { return &m_uprate; }
-        vol2com::BoundedValue* selectedBand() { return &m_selectedBand; }
-        bool showBackground() const { return m_showBackground; }
-        AbstractBandViewer::BarsStyle barsStyle() const { return m_barsStyle; }
-        AbstractBandViewer::ColorSource colorSource() const { return m_colorSource; }
-
-    public slots:
-        virtual void start() override;
-        virtual void stop() override;
-        virtual void process() override = 0;
-        virtual void save() override;
-        virtual void load() override;
-
-        void setShowBackground(bool showBackground);
-        void setBarsStyle(AbstractBandViewer::BarsStyle barsStyle);
-        void setColorSource(AbstractBandViewer::ColorSource colorSource);
-
-    signals:
-        void showBackgroundChanged(bool showBackground);
-        void barsStyleChanged(AbstractBandViewer::BarsStyle barsStyle);
-        void colorSourceChanged(AbstractBandViewer::ColorSource colorSource);
-
-    protected:
-        std::shared_ptr<BassLibWrapper> m_bassLib;
-        std::shared_ptr<Equalizer> m_eq;
-        QTimer* m_timer;
-
-        BoundedValue m_uprate;
-        BoundedValue m_selectedBand;
-        bool m_showBackground;
-        AbstractBandViewer::BarsStyle m_barsStyle;
-        AbstractBandViewer::ColorSource m_colorSource;
-
-    protected slots:
-        void onUpdadeRateChanged(int value);
+      UpdateRate,
+      SelectedBand,
+      ShowBackground,
+      BarsStyle,
+      ColorSource
     };
+    Q_ENUM(SettingsKeys)
+
+    explicit WorkModeWithSelector(QObject *parent = nullptr);
+
+    virtual QString name() const override =0;
+    virtual QString qmlDelegate() const override =0;
+    virtual QColor getGuiColor(uint8_t value) const =0;
+
+    vol2com::BoundedValue* uprate() { return &m_uprate; }
+    vol2com::BoundedValue* selectedBand() { return &m_selectedBand; }
+    bool showBackground() const { return m_showBackground; }
+    AbstractBandViewer::BarsStyle barsStyle() const { return m_barsStyle; }
+    AbstractBandViewer::ColorSource colorSource() const { return m_colorSource; }
+
+  public slots:
+    virtual void start() override;
+    virtual void stop() override;
+    virtual void process() override = 0;
+    virtual void save() override;
+    virtual void load() override;
+
+    void setShowBackground(bool showBackground);
+    void setBarsStyle(AbstractBandViewer::BarsStyle barsStyle);
+    void setColorSource(AbstractBandViewer::ColorSource colorSource);
+
+  signals:
+    void showBackgroundChanged(bool showBackground);
+    void barsStyleChanged(AbstractBandViewer::BarsStyle barsStyle);
+    void colorSourceChanged(AbstractBandViewer::ColorSource colorSource);
+
+  protected:
+    std::shared_ptr<BassLibWrapper> m_bassLib;
+    std::shared_ptr<Equalizer> m_eq;
+    QTimer* m_timer;
+
+    BoundedValue m_uprate;
+    BoundedValue m_selectedBand;
+    bool m_showBackground;
+    AbstractBandViewer::BarsStyle m_barsStyle;
+    AbstractBandViewer::ColorSource m_colorSource;
+
+  protected slots:
+    void onUpdadeRateChanged(int value);
+  };
 }
 
 Q_DECLARE_METATYPE(vol2com::WorkModeWithSelector*)

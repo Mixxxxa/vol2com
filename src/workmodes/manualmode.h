@@ -46,8 +46,7 @@ namespace vol2com
         };
         Q_ENUM(SettingsKeys)
 
-        ManualMode();
-        ~ManualMode();
+        explicit ManualMode(QObject *parent = nullptr);
 
         virtual QString name() const override
         {

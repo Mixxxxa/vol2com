@@ -31,8 +31,7 @@ namespace vol2com
         Q_OBJECT
 
     public:
-        explicit GeneralMode();
-        ~GeneralMode();
+        explicit GeneralMode(QObject *parent = nullptr);
 
         virtual QString name() const override
         {

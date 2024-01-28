@@ -31,40 +31,40 @@
 
 namespace vol2com
 {
-    class ToolbarViewModel : public QObject
-    {
-        Q_OBJECT
-        Q_PROPERTY(vol2com::Controller::Page page READ page WRITE setPage NOTIFY pageChanged)
-        Q_PROPERTY(bool showStatus READ showStatus WRITE setShowStatus NOTIFY showStatusChanged)
-        Q_PROPERTY(bool backarrowActive READ backarrowActive WRITE setBackarrowActive NOTIFY backarrowActiveChanged)
-        QML_ELEMENT
+  class ToolbarViewModel : public QObject
+  {
+    Q_OBJECT
+    Q_PROPERTY(vol2com::Controller::Page page READ page WRITE setPage NOTIFY pageChanged)
+    Q_PROPERTY(bool showStatus READ showStatus WRITE setShowStatus NOTIFY showStatusChanged)
+    Q_PROPERTY(bool backarrowActive READ backarrowActive WRITE setBackarrowActive NOTIFY backarrowActiveChanged)
+    QML_ELEMENT
 
-    public:
-        explicit ToolbarViewModel(QObject *parent = nullptr);
+  public:
+    explicit ToolbarViewModel(QObject *parent = nullptr);
 
-        Controller::Page page() const { return m_page; }
-        bool showStatus() const { return m_showStatus; }
-        bool backarrowActive() const { return m_backarrowActive; }
+    Controller::Page page() const { return m_page; }
+    bool showStatus() const { return m_showStatus; }
+    bool backarrowActive() const { return m_backarrowActive; }
 
-    public slots:
-        void setPage(vol2com::Controller::Page page);
-        void setShowStatus(bool showStatus);
-        void setBackarrowActive(bool backarrowActive);
-        void onModeChanged(std::shared_ptr<WorkModeBase> mode);
+  public slots:
+    void setPage(vol2com::Controller::Page page);
+    void setShowStatus(bool showStatus);
+    void setBackarrowActive(bool backarrowActive);
+    void onModeChanged(std::shared_ptr<WorkModeBase> mode);
 
-    signals:
-        void pageChanged(Controller::Page page);
-        void showStatusChanged(bool showStatus);
-        void backarrowActiveChanged(bool backarrowActive);
+  signals:
+    void pageChanged(Controller::Page page);
+    void showStatusChanged(bool showStatus);
+    void backarrowActiveChanged(bool backarrowActive);
 
-    private:
-        void updateBackArrow();
+  private:
+    void updateBackArrow();
 
-        vol2com::Controller::Page m_page;
-        bool m_showStatus;
-        bool m_backarrowActive;
-        std::weak_ptr<WorkModeBase> m_workMode;
-    };
+    Controller::Page m_page = Controller::Page::ConnectPage;
+    bool m_showStatus = false;
+    bool m_backarrowActive = false;
+    std::weak_ptr<WorkModeBase> m_workMode;
+  };
 }
 
 //#endif // UIVIEWMODEL_H
