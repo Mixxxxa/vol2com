@@ -33,51 +33,50 @@ WorkModesModel::WorkModesModel(QObject* parent)
 
 int WorkModesModel::rowCount(const QModelIndex& parent) const
 {
-    Q_UNUSED(parent)
-    return static_cast<int>(m_data.size());
+  Q_UNUSED(parent)
+  return static_cast<int>(m_data.size());
 }
 
 QVariant WorkModesModel::data(const QModelIndex& index, int role) const
 {
-    if (index.row() < 0 || index.row() >= static_cast<int>(m_data.size()))
-        return QVariant();
-
-    const auto &item = m_data[index.row()];
+  if (const auto row = index.row();
+         index.isValid()
+      && row >= 0
+      && row < static_cast<int>(m_data.size()))
+  {
+    const auto &item = m_data[static_cast<decltype(m_data)::size_type>(row)];
     switch(role)
     {
-    case IdRole:
-        return item.id;
-    case NameRole:
-        return item.name;
-    case DescriptionRole:
-        return item.description;
-    case ImageRole:
-        return item.image;
-    default:
-        return QVariant();
+    case IdRole:          return item.id;
+    case NameRole:        return item.name;
+    case DescriptionRole: return item.description;
+    case ImageRole:       return item.image;
     }
+  }
+
+  return {};
 }
 
 void WorkModesModel::add(const QString &id, const QString& name, const QString& description, const QVariant& image)
 {
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    m_data.emplace_back(id, name, description, image);
-    endInsertRows();
+  beginInsertRows(QModelIndex(), rowCount(), rowCount());
+  m_data.emplace_back(id, name, description, image);
+  endInsertRows();
 }
 
 void WorkModesModel::clear()
 {
-    beginResetModel();
-    m_data.clear();
-    endResetModel();
+  beginResetModel();
+  m_data.clear();
+  endResetModel();
 }
 
 QHash<int, QByteArray> WorkModesModel::roleNames() const
 {
-    QHash<int, QByteArray> roles;
-    roles[IdRole] = "id";
-    roles[NameRole] = "name";
-    roles[DescriptionRole] = "description";
-    roles[ImageRole] = "image";
-    return roles;
+  QHash<int, QByteArray> roles;
+  roles[IdRole] = "id";
+  roles[NameRole] = "name";
+  roles[DescriptionRole] = "description";
+  roles[ImageRole] = "image";
+  return roles;
 }

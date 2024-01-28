@@ -24,10 +24,13 @@
 
 #include "serialconnector.h"
 #include "serialworker.h"
+#include <QSerialPortInfo>
 #include "datamodels/basicqmlmodel.h"
 #include "settings.h"
-#include <QSerialPortInfo>
-#include <QThread>
+#pragma warning ( push )
+#pragma warning( disable : 5204)
+#include <QThread> // Disable C5204 from ppwin.h that is used by <future>
+#pragma warning ( pop )
 #include <QRegularExpression>
 
 namespace
@@ -199,7 +202,7 @@ namespace vol2com
 
   void SerialConnector::save()
   {
-    auto& settings = Settings::getInstance();
+    //auto& settings = Settings::getInstance();
     //settings.set(QString(::Name), SettingsKeys::Port, m_port);
     //settings.set(QString(::Name), SettingsKeys::Baudrate, m_baudrate);
     //settings.set(QString(::Name), SettingsKeys::Databits, m_dataBits);

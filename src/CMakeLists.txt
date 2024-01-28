@@ -1,12 +1,14 @@
 ﻿cmake_minimum_required(VERSION 3.22)
 
+qt_standard_project_setup(REQUIRES 6.5)
+
 qt_add_executable(appvol2com
     main.cpp
     resource.rc
 )
 
 set_target_properties(appvol2com PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+    #MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appvol2com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
@@ -19,14 +21,10 @@ target_link_libraries(appvol2com PRIVATE
     Qt::Quick
     Qt::QuickControls2
     Qt::SerialPort
+    Qt::Qml
     bass_lib
     basswasapi_lib
 )
-if(UNIX AND NOT APPLE AND CMAKE_CROSSCOMPILING)
-    find_package(Qt6 COMPONENTS QuickTemplates2)
-     # Work around QTBUG-86533
-    target_link_libraries(appvol2com PRIVATE Qt::QuickTemplates2)
-endif()
 
 qt_add_qml_module(appvol2com
     URI vol2com
@@ -113,7 +111,6 @@ qt_add_qml_module(appvol2com
         workmodes/manualmode.h
         workmodes/randommode.cpp
         workmodes/randommode.h
-        workmodes/submodebase.h
         workmodes/workmodewithselector.cpp
         workmodes/workmodewithselector.h
         workmodesfactory.cpp
@@ -139,17 +136,18 @@ qt_add_qml_module(appvol2com
         res/modes/random.svg
 )
 
+include(GNUInstallDirs)
 install(TARGETS appvol2com
-    #RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-qt_generate_deploy_qml_app_script(
-    TARGET appvol2com
-    FILENAME_VARIABLE deploy_script
-)
-install(SCRIPT ${deploy_script})
+#qt_generate_deploy_qml_app_script(
+#    TARGET appvol2com
+#    FILENAME_VARIABLE deploy_script
+#)
+#install(SCRIPT ${deploy_script})
 install(FILES $<TARGET_PROPERTY:bass_lib,IMPORTED_LOCATION>
               $<TARGET_PROPERTY:basswasapi_lib,IMPORTED_LOCATION>
         DESTINATION ${CMAKE_INSTALL_BINDIR}

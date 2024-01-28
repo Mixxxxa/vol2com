@@ -45,7 +45,7 @@ AppStyle& AppStyle::getInstance()
 //    repaint();
 //}
 
-AppStyle *AppStyle::create(QQmlEngine *, QJSEngine *engine)
+AppStyle *AppStyle::create(QQmlEngine *, [[maybe_unused]] QJSEngine *engine)
 {
   auto *result = &(AppStyle::getInstance());
   QJSEngine::setObjectOwnership(result, QJSEngine::ObjectOwnership::CppOwnership);

@@ -25,31 +25,36 @@
 #include "v2cbase.h"
 #include <QTimer>
 
-using namespace vol2com;
+using namespace std::chrono_literals;
 
-V2CBase::V2CBase(QObject *parent) :
-    QObject(parent),
-    m_saveTimer(new QTimer(this)),
-    m_saveTimeout(5000)
+namespace vol2com
 {
+  V2CBase::V2CBase(QObject *parent)
+    : QObject      { parent }
+    , m_saveTimer  { new QTimer{ this } }
+    , m_saveTimeout{ 5s }
+  {
     m_saveTimer->setSingleShot(true);
     m_saveTimer->setTimerType(Qt::VeryCoarseTimer);
     QObject::connect(m_saveTimer, &QTimer::timeout,
                      this, &V2CBase::save);
-}
+  }
 
-void V2CBase::scheduleSave() const
-{
+  void V2CBase::scheduleSave()
+  {
     if(m_saveTimer)
-        m_saveTimer->start(m_saveTimeout);
-}
+    {
+      m_saveTimer->start(m_saveTimeout);
+    }
+  }
 
-unsigned V2CBase::saveTimeout() const
-{
+  std::chrono::milliseconds V2CBase::saveTimeout() const
+  {
     return m_saveTimeout;
-}
+  }
 
-void V2CBase::setSaveTimeout(const unsigned &timeout_msec)
-{
-    m_saveTimeout = timeout_msec;
+  void V2CBase::setSaveTimeout(std::chrono::milliseconds timeout)
+  {
+    m_saveTimeout = timeout;
+  }
 }

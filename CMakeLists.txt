@@ -8,7 +8,7 @@ project(vol2com VERSION 0.8
 
 set(FETCHCONTENT_QUIET OFF)
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG Off)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
@@ -32,7 +32,7 @@ include(cmake/gitinfo.cmake)
 
 FetchContent_Declare(bass
   URL https://www.un4seen.com/files/bass24.zip
-  URL_HASH SHA1=7709EC0FF565319493AF835FB9BE7486C581C5D8
+  URL_HASH SHA1=0696189F72FB360E535FC7C3E07D29AF5C7D0E6D
   DOWNLOAD_EXTRACT_TIMESTAMP ON
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
@@ -40,7 +40,7 @@ FetchContent_Declare(bass
 
 FetchContent_Declare(bass_wasapi
   URL https://www.un4seen.com/files/basswasapi24.zip
-  URL_HASH SHA1=53685BD9BDD379F4F7F1BA4E1AE2AAA1636B3ACE
+  URL_HASH SHA1=F1F2C0ADCAA905406CE6B50F43A57DEFE10C20D8
   DOWNLOAD_EXTRACT_TIMESTAMP ON
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
@@ -66,6 +66,7 @@ find_package(${QtX} REQUIRED
                     COMPONENTS
                         Gui
                         Quick
+                        Qml
                         QuickControls2
                         SerialPort
                         #QuickTemplates2
@@ -75,29 +76,27 @@ find_package(${QtX} REQUIRED
 # Compilers setup
 ################################################################################
 if (MSVC)
-    add_compile_options(/Zi
-                        /nologo
-#                        /W4
-#                        /WX
-                        /diagnostics:classic
+    add_compile_options(/Zi          # generate separate .pdb file
+                        /nologo      # disable MSVC logo
+                        /Wall        # enable all errors
+                        /WX          # treat all warnings as errors
+                        /external:W0 # disable compiler warnings in external code
+                        /permissive- # strict standards conformance
+                        /GS          # enable buffer security check
+                        /FC          # full path of source code file in diagnostics
+                        /Zc:inline   # remove unreferenced functions or data
                         "$<$<CONFIG:DEBUG>:/Od>"
                         "$<$<CONFIG:RELEASE>:/O2>"
-                        "$<$<CONFIG:RELEASE>:/Ob2>"
-                        "$<$<CONFIG:RELEASE>:/Oi>"
-                        "$<$<CONFIG:RELEASE>:/Ot>"
-                        "$<$<CONFIG:RELEASE>:/Oy>"
-                        /EHa
-                        /GS
-                        /fp:precise
-                        /Zc:wchar_t
-                        /Zc:forScope
-                        /Zc:inline
-                        /openmp-
-                        /Gd
-                        /FC
-                        /errorReport:prompt
-                        /bigobj
-                        /wd4324
+                        /wd4061 # enumerator in switch of enum is not explicitly handled by a case label
+                        /wd4464 # relative include path contains '..' (because moc files)
+                        /wd4625 # copy constructor was implicitly defined as deleted
+                        /wd4626 # assignment operator was implicitly defined as deleted
+                        /wd4702 # unreachable code (because can't suppress them on QtQml)
+                        /wd4820 # n bytes padding added after data member
+                        /wd4866 # compiler may not enforce left-to-right evaluation order for call to
+                        /wd5026 # move constructor was implicitly defined as deleted
+                        /wd5027 # move assignment operator was implicitly defined as deleted
+                        /wd5045 # compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
     )
     if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         add_compile_options(/MP

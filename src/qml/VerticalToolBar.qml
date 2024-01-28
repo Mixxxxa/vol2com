@@ -61,7 +61,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 6
                 visible: !viewModel.backarrowActive
-                source: "qrc:/vol2com/res/icon-active.svg"
+                source: "qrc:/qt/qml/vol2com/res/icon-active.svg"
                 sourceSize.width: height
                 sourceSize.height: height
                 verticalAlignment: Image.AlignVCenter

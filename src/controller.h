@@ -69,7 +69,7 @@ namespace vol2com
     };
     Q_ENUM(Page)
 
-    static Controller *create(QQmlEngine *, QJSEngine *engine);
+    static Controller *create(QQmlEngine *, QJSEngine *);
     static Controller& getInstance();
     ~Controller();
 

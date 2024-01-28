@@ -62,17 +62,17 @@ Rectangle {
         function getSource(page){
             switch(page){
             case VC.Controller.ConnectPage:
-                return "qrc:/vol2com/qml/ConnectView.qml";
+                return "qrc:/qt/qml/vol2com/qml/ConnectView.qml";
             case VC.Controller.WorkModePage:
-                return "qrc:/vol2com/qml/WorkModeView.qml";
+                return "qrc:/qt/qml/vol2com/qml/WorkModeView.qml";
             case VC.Controller.EqualizerPage:
-                return "qrc:/vol2com/qml/EqualizerView.qml";
+                return "qrc:/qt/qml/vol2com/qml/EqualizerView.qml";
             case VC.Controller.SettingsPage:
-                return "qrc:/vol2com/qml/Settings.qml";
+                return "qrc:/qt/qml/vol2com/qml/Settings.qml";
             case VC.Controller.AboutPage:
-                return "qrc:/vol2com/qml/AboutView.qml";
+                return "qrc:/qt/qml/vol2com/qml/AboutView.qml";
             default:
-                return "qrc:/vol2com/qml/Settings.qml";
+                return "qrc:/qt/qml/vol2com/qml/Settings.qml";
             }
         }
 
@@ -99,7 +99,7 @@ Rectangle {
     Component.onCompleted: {
         if(Settings.photosensitiveWarningAccepted === false)
         {
-            let comp = Qt.createComponent("qrc:/vol2com/qml/EpilepsyWarningPopup.qml");
+            let comp = Qt.createComponent("qrc:/qt/qml/vol2com/qml/EpilepsyWarningPopup.qml");
             if (comp && comp.status === Component.Ready) {
                 let warning = comp.createObject(mainView);
                 if (warning) {

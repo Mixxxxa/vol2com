@@ -19,35 +19,36 @@
 **
 ****************************************************************************/
 
-#ifndef V2CBASE_H
-#define V2CBASE_H
+#pragma once
 
 #include <QObject>
+#include <chrono>
 
 class QTimer;
 
 namespace vol2com
 {
-    class V2CBase : public QObject
-    {
-        Q_OBJECT
+  /*!
+   * @brief Base class for all objects with timer
+   */
+  class V2CBase : public QObject
+  {
+    Q_OBJECT
 
-    public:
-        explicit V2CBase(QObject *parent = nullptr);
-        virtual ~V2CBase() = default;
+  public:
+    explicit V2CBase(QObject *parent = nullptr);
+    virtual ~V2CBase() = default;
 
-        unsigned saveTimeout() const;
-        void setSaveTimeout(const unsigned& timeout_msec);
+    std::chrono::milliseconds saveTimeout() const;
+    void setSaveTimeout(std::chrono::milliseconds timeout);
 
-    public slots:
-        void scheduleSave() const;
-        virtual void save() = 0;
-        virtual void load() = 0;
+  public slots:
+    void scheduleSave();
+    virtual void save() = 0;
+    virtual void load() = 0;
 
-    private:
-        QTimer* m_saveTimer;
-        unsigned m_saveTimeout;
-    };
+  private:
+    QTimer* m_saveTimer;
+    std::chrono::milliseconds m_saveTimeout;
+  };
 }
-
-#endif // V2CBASE_H

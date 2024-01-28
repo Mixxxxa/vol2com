@@ -76,8 +76,9 @@ namespace
     const auto check = u"MSVC %1 (%2)"_s.arg(msvcRelease).arg(_MSC_VER);
 
     return u"MSVC %1 (%2)"_s.arg(msvcRelease).arg(_MSC_VER);
+#else
+#error Unknown compiler
 #endif
-    return u"Unknown compiler"_s;
   }
 }
 

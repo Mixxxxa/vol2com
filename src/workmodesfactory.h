@@ -30,55 +30,56 @@
 
 namespace vol2com
 {
-    class WorkModeCreatorBase
+  class WorkModeCreatorBase
+  {
+  public:
+    WorkModeCreatorBase() = default;
+    virtual ~WorkModeCreatorBase() = default;
+    virtual std::unique_ptr<WorkModeBase> create() const = 0;
+  };
+
+  template <class C>
+  class WorkModeCreator : public WorkModeCreatorBase
+  {
+  public:
+    virtual std::unique_ptr<WorkModeBase> create() const
     {
-    public:
-        WorkModeCreatorBase() {}
-        virtual std::unique_ptr<WorkModeBase> create() const = 0;
-    };
+      return std::make_unique<C>();
+    }
+  };
+
+  class WorkModesFactory
+  {
+  protected:
+    typedef std::map<QString, std::unique_ptr<WorkModeCreatorBase> > FactoryMap;
+    FactoryMap m_factory;
+    std::shared_ptr<WorkModesModel> m_model;
+
+  public:
+    WorkModesFactory();
+    virtual ~WorkModesFactory() {}
 
     template <class C>
-    class WorkModeCreator : public WorkModeCreatorBase
+    void add(const QString& id, const QString& name, const QString& description, const QString& image)
     {
-    public:
-        virtual std::unique_ptr<WorkModeBase> create() const
-        {
-            return std::make_unique<C>();
-        }
-    };
+      auto it = m_factory.find(id);
+      if (it == m_factory.end())
+      {
+        m_factory[id] = std::make_unique<WorkModeCreator<C> >();
+        m_model->add(id, name, description, image);
+      }
+    }
 
-    class WorkModesFactory
+    std::unique_ptr<WorkModeBase> create(const QString& id)
     {
-    protected:
-        typedef std::map<QString, std::unique_ptr<WorkModeCreatorBase> > FactoryMap;
-        FactoryMap m_factory;
-        std::shared_ptr<WorkModesModel> m_model;
+      auto it = m_factory.find(id);
+      if (it != m_factory.end())
+        return it->second->create();
+      return std::unique_ptr<WorkModeBase>(nullptr);
+    }
 
-    public:
-        WorkModesFactory();
-        virtual ~WorkModesFactory() {}
-
-        template <class C>
-        void add(const QString& id, const QString& name, const QString& description, const QString& image)
-        {
-            auto it = m_factory.find(id);
-            if (it == m_factory.end())
-            {
-                m_factory[id] = std::make_unique<WorkModeCreator<C> >();
-                m_model->add(id, name, description, image);
-            }
-        }
-
-        std::unique_ptr<WorkModeBase> create(const QString& id)
-        {
-            auto it = m_factory.find(id);
-            if (it != m_factory.end())
-                return it->second->create();
-            return std::unique_ptr<WorkModeBase>(nullptr);
-        }
-
-        std::shared_ptr<WorkModesModel> model() const;
-    };
+    std::shared_ptr<WorkModesModel> model() const;
+  };
 }
 
 #endif // WORKMODESFACTORY_H

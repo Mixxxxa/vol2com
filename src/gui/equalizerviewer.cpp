@@ -23,10 +23,10 @@
 ****************************************************************************/
 
 #include "equalizerviewer.h"
-#include "workmodes/workmodebase.h"
 #include "controller.h"
 #include "equalizer.h"
 #include "utils/math.hpp"
+#include "workmodes/workmodebase.h"
 #include <QPainter>
 #include <algorithm>
 

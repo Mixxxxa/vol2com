@@ -26,106 +26,103 @@
 #include "controller.h"
 #include "equalizer.h"
 #include "utils/math.hpp"
-#include <QTimer>
 #include <QPainter>
+#include <QTimer>
 
 using namespace vol2com;
 
-BandSelector::BandSelector(QQuickItem* parent) :
-    AbstractBandViewer(parent),
-    m_bassLib(Controller::getInstance().bassLib()),
-    m_eq(Controller::getInstance().equalizer()),
-    m_data({}),
-    m_colorFunc(std::bind(&BandSelector::defaultColor, this, std::placeholders::_1)),
-    m_activeBandBrush(Qt::blue),
-    m_unactiveBandBrush(Qt::gray)
+BandSelector::BandSelector(QQuickItem *parent)
+  : AbstractBandViewer(parent)
+  , m_bassLib(Controller::getInstance().bassLib())
+  , m_eq(Controller::getInstance().equalizer())
+  , m_data({})
+  , m_colorFunc{ &BandSelector::defaultColor } // m_colorFunc(std::bind(&BandSelector::defaultColor, this, std::placeholders::_1))
+  , m_activeBandBrush(Qt::blue)
+  , m_unactiveBandBrush(Qt::gray)
 {
-    QObject::connect(m_bassLib.get(), &BassLibWrapper::stateChanged,
-                     this, &BandSelector::onBassLibStateChanged);
-    QObject::connect(this, &BandSelector::colorSourceChanged,
-                     this, &BandSelector::onColorSourceChanged);
+  QObject::connect(m_bassLib.get(), &BassLibWrapper::stateChanged, this, &BandSelector::onBassLibStateChanged);
+  QObject::connect(this, &BandSelector::colorSourceChanged, this, &BandSelector::onColorSourceChanged);
 }
 
-void BandSelector::paint(QPainter* painter)
+void BandSelector::paint(QPainter *painter)
 {
-    AbstractBandViewer::paint(painter);
-    const int ItemHeight = height() - BarsPadding * 2;
-    const auto startY = height() - BarsPadding;
-    QColor color;
+  AbstractBandViewer::paint(painter);
+  const int ItemHeight = height() - BarsPadding * 2;
+  const auto startY = height() - BarsPadding;
+  QColor color;
 
-    for(size_t i = 0; i < m_data.size(); ++i)
+  for (size_t i = 0; i < m_data.size(); ++i)
+  {
+    if (m_data[i] == 0)
     {
-        if(m_data[i] == 0)
-        {
-          return;
-        }
-
-        const auto& rect = m_rects[i];
-        const int height = remap<int>(m_eq->processValue(static_cast<int>(i), m_data[i]), 0, 255, 0 , ItemHeight);
-
-        if(m_barsStyle == BarsStyle::AllPainted || static_cast<int>(i) == m_selectedBand)
-        {
-            color = m_colorFunc(m_eq->processValue(static_cast<int>(i), m_data[i]));
-            m_activeBandBrush.setColor(color);
-            painter->fillRect(rect.x(), startY, rect.width(), -height, m_activeBandBrush);
-        }
-        else
-        {
-            painter->fillRect(rect.x(), startY, rect.width(), -height, m_unactiveBandBrush);
-        }
+      return;
     }
+
+    const auto &rect = m_rects[i];
+    const int height = remap<int>(m_eq->processValue(static_cast<int>(i), m_data[i]), 0, 255, 0, ItemHeight);
+
+    if (m_barsStyle == BarsStyle::AllPainted || static_cast<int>(i) == m_selectedBand)
+    {
+      color = m_colorFunc(m_eq->processValue(static_cast<int>(i), m_data[i]));
+      m_activeBandBrush.setColor(color);
+      painter->fillRect(rect.x(), startY, rect.width(), -height, m_activeBandBrush);
+    }
+    else
+    {
+      painter->fillRect(rect.x(), startY, rect.width(), -height, m_unactiveBandBrush);
+    }
+  }
 }
 
 WorkModeWithSelector::ColorFunc BandSelector::colorFunc() const
 {
-    return m_colorFunc;
+  return m_colorFunc;
 }
 
 void BandSelector::onTimer()
 {
-    switch(m_bassLib->state()){
-    case BassLibWrapper::State::Error:
-        return;
-    case BassLibWrapper::State::Idle:
-        if(!m_bassLib->start())
-            return;
-        break;
-    case BassLibWrapper::State::Active:
-        break;
-    }
+  switch (m_bassLib->state())
+  {
+  case BassLibWrapper::State::Error: return;
+  case BassLibWrapper::State::Idle:
+    if (!m_bassLib->start())
+      return;
+    break;
+  case BassLibWrapper::State::Active: break;
+  }
 
-    m_data = m_bassLib->allBands();
-    update();
+  m_data = m_bassLib->allBands();
+  update();
 }
 
 void BandSelector::onColorSourceChanged(AbstractBandViewer::ColorSource source)
 {
-    if(source == ColorSource::ActiveMode)
+  if (source == ColorSource::ActiveMode)
+  {
+    auto mode = std::dynamic_pointer_cast<WorkModeWithSelector>(Controller::getInstance().mode());
+    assert(mode);
+    if (mode)
     {
-        auto mode = std::dynamic_pointer_cast<WorkModeWithSelector>(Controller::getInstance().mode());
-        assert(mode);
-        if(mode)
-        {
-            m_colorFunc = std::bind(&WorkModeWithSelector::getGuiColor, mode.get(), std::placeholders::_1);
-        }
+      m_colorFunc = std::bind(&WorkModeWithSelector::getGuiColor, mode.get(), std::placeholders::_1);
     }
-    else
-    {
-        m_colorFunc = std::bind(&BandSelector::defaultColor, this, std::placeholders::_1);
-    }
+  }
+  else
+  {
+    m_colorFunc = { &BandSelector::defaultColor };
+  }
+  update();
+}
+
+void BandSelector::onBassLibStateChanged(const BassLibWrapper::State &state)
+{
+  if (state == BassLibWrapper::State::Error)
+  {
+    std::fill(m_data.begin(), m_data.end(), static_cast<BassLibWrapper::value_type>(0));
     update();
+  }
 }
 
-void BandSelector::onBassLibStateChanged(const BassLibWrapper::State& state)
+QColor BandSelector::defaultColor(const uint8_t &value)
 {
-    if(state == BassLibWrapper::State::Error)
-    {
-        m_data = { 0 };
-        update();
-    }
-}
-
-QColor BandSelector::defaultColor(const uint8_t& value) const
-{
-    return QColor::fromHsv(remap<short>(value, 0, 255, 120, 0), 255, 255);
+  return QColor::fromHsv(remap<short>(value, 0, 255, 120, 0), 255, 255);
 }

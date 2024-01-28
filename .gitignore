@@ -51,6 +51,5 @@ compile_commands.json
 # QtCreator local machine specific files for imported projects
 *creator.user*
 
-# Libraries
-src/libs/*
-!src/libs/*.txt
+# Other
+src/utils/gitinfo.h

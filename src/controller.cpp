@@ -58,11 +58,14 @@ Controller::Controller(QObject *parent)
   , m_equalizer { std::make_shared<Equalizer>() }
   , m_factory   { std::make_shared<WorkModesFactory>() }
 {
-  m_factory->add<GeneralMode>(u"General"_s,     tr("General"),   tr("All color spectre available"), u"qrc:/vol2com/res/modes/general.svg"_s);
-  m_factory->add<FadeMode>(u"Fade"_s,           tr("Fade"),      tr("Fading of selected color"),    u"qrc:/vol2com/res/modes/fade.svg"_s);
-  m_factory->add<RandomMode>(u"Random"_s,       tr("Random"),    tr("Randomly changing colors"),    u"qrc:/vol2com/res/modes/random.svg"_s);
-  m_factory->add<ManualMode>(u"Manual"_s,       tr("Manual"),    tr("Select any color"),            u"qrc:/vol2com/res/modes/manual.svg"_s);
-  m_factory->add<ChristmasMode>(u"Christmas"_s, tr("Christmas"), tr("Imitation of christmas leds"), u"qrc:/vol2com/res/modes/christmas.svg"_s);
+  m_equalizer->load();
+
+
+  m_factory->add<GeneralMode>(u"General"_s,     tr("General"),   tr("All color spectre available"), u"qrc:/qt/qml/vol2com/res/modes/general.svg"_s);
+  m_factory->add<FadeMode>(u"Fade"_s,           tr("Fade"),      tr("Fading of selected color"),    u"qrc:/qt/qml/vol2com/res/modes/fade.svg"_s);
+  m_factory->add<RandomMode>(u"Random"_s,       tr("Random"),    tr("Randomly changing colors"),    u"qrc:/qt/qml/vol2com/res/modes/random.svg"_s);
+  m_factory->add<ManualMode>(u"Manual"_s,       tr("Manual"),    tr("Select any color"),            u"qrc:/qt/qml/vol2com/res/modes/manual.svg"_s);
+  m_factory->add<ChristmasMode>(u"Christmas"_s, tr("Christmas"), tr("Imitation of christmas leds"), u"qrc:/qt/qml/vol2com/res/modes/christmas.svg"_s);
 
   QObject::connect(connector().get(), &ConnectMethodBase::stateChanged,
                                 this, &Controller::onConnectionStateChanged);
@@ -100,7 +103,7 @@ bool Controller::isMainWindowOpened() const
   return (m_mainWindow && m_mainWindow->isActive());
 }
 
-Controller *Controller::create(QQmlEngine *, QJSEngine *engine)
+Controller *Controller::create(QQmlEngine *, QJSEngine */*engine*/)
 {
   Controller *result = &(Controller::getInstance());
   QJSEngine::setObjectOwnership(result, QJSEngine::ObjectOwnership::CppOwnership);
@@ -124,7 +127,11 @@ void Controller::deInit()
   if(m_connector)
     m_connector = nullptr;
   if(m_equalizer)
+  {
+
     m_equalizer = nullptr;
+  }
+
   if(m_bassLib)
     m_bassLib = nullptr;
   if(m_factory)
@@ -139,24 +146,34 @@ void Controller::openUI()
   {
     //QQmlApplicationEngine engine;
     m_engine = std::make_unique<QQmlApplicationEngine>();
+    //m_engine->addImportPath(QCoreApplication::applicationDirPath() + "/qml");
+    //m_engine->addImportPath(":/");
     //qmlRegisterSingletonInstance("vol2com", 1, 0, "Settings", &Settings::getInstance());
     //qmlRegisterSingletonInstance("vol2com", 1, 0, "Controller", this);
     //qmlRegisterSingletonInstance("vol2com", 1, 0, "AppStyle", &AppStyle::getInstance());
 
-    const QUrl url(u"qrc:/vol2com/qml/main.qml"_qs);
-    QObject::connect(m_engine.get(), &QQmlApplicationEngine::objectCreated,
-                     qGuiApp, [url](QObject *obj, const QUrl &objUrl)
-    {
-        if (!obj && url == objUrl)
-        {
-          QCoreApplication::exit(-1);
-        }
-    }, Qt::QueuedConnection);
+    QObject::connect(
+      m_engine.get(),
+      &QQmlApplicationEngine::objectCreationFailed,
+      qGuiApp,
+      []() { QCoreApplication::exit(-1); },
+      Qt::QueuedConnection);
+    //m_engine->loadFromModule("vol2com", "main");
+
+    const QUrl url(u"qrc:/qt/qml/vol2com/qml/main.qml"_qs);
+    // QObject::connect(m_engine.get(), &QQmlApplicationEngine::objectCreated,
+    //                  qGuiApp, [url](QObject *obj, const QUrl &objUrl)
+    // {
+    //     if (!obj && url == objUrl)
+    //     {
+    //       QCoreApplication::exit(-1);
+    //     }
+    // }, Qt::QueuedConnection);
     m_engine->load(url);
 
 
     //m_engine = std::make_unique<QQmlApplicationEngine>();
-    //m_engine->addImportPath(u"qrc:/vol2com/qml/"_qs);
+    //m_engine->addImportPath(u"qrc:/qt/qml/vol2com/qml/"_qs);
     //vol2com::GUIHelper::registerQMLTypes();
     //qmlRegisterSingletonInstance("vol2com", 1, 0, "Settings", &Settings::getInstance());
     //qmlRegisterSingletonInstance("vol2com", 1, 0, "Controller", this);
@@ -169,7 +186,7 @@ void Controller::openUI()
   }
 
 
-  //const QUrl url(u"qrc:/vol2com/qml/main.qml"_qs);
+  //const QUrl url(u"qrc:/qt/qml/vol2com/qml/main.qml"_qs);
   //QObject::connect(m_engine.get(), &QQmlApplicationEngine::objectCreated,
   //                 qGuiApp, [url](QObject *obj, const QUrl &objUrl)
   //{
@@ -179,7 +196,7 @@ void Controller::openUI()
   //  }
   //}, Qt::QueuedConnection);
   //m_engine->load(url);
-  //const QUrl url(QStringLiteral("qrc:/vol2com/main.qml"));
+  //const QUrl url(QStringLiteral("qrc:/qt/qml/vol2com/main.qml"));
   //QObject::connect(m_engine.get(), &QQmlApplicationEngine::objectCreated,
   //                 qGuiApp, [url](QObject *obj, const QUrl &objUrl)
   //{

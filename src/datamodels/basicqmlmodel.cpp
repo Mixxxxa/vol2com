@@ -38,19 +38,20 @@ namespace vol2com
 
   QVariant BasicQMLModel::data(const QModelIndex& index, int role) const
   {
-    const auto row = index.row();
-    if(index.isValid()
-       && row >= 0
-       && static_cast<container_type::size_type>(row) < m_data.size())
+    if(const auto row = index.row();
+           index.isValid()
+        && row >= 0
+        && static_cast<container_type::size_type>(index.row()) < m_data.size())
     {
       const auto &rowData = m_data[static_cast<container_type::size_type>(row)];
       switch(role)
       {
-        case Roles::TextRole:  return rowData.text;
-        case Roles::ValueRole: return rowData.value;
-        case Roles::ImageRole: return rowData.image;
+      case Roles::TextRole:  return rowData.text;
+      case Roles::ValueRole: return rowData.value;
+      case Roles::ImageRole: return rowData.image;
       }
     }
+
     return {};
   }
 
@@ -59,7 +60,9 @@ namespace vol2com
     for(size_t i = 0; i < m_data.size(); ++i)
     {
       if(m_data[i].value == value)
+      {
         return static_cast<int>(i);
+      }
     }
 
     return -1;
@@ -94,7 +97,7 @@ namespace vol2com
   QHash<int, QByteArray> BasicQMLModel::roleNames() const
   {
     QHash<int, QByteArray> roles;
-    roles[TextRole] = "text";
+    roles[TextRole]  = "text";
     roles[ValueRole] = "value";
     roles[ImageRole] = "image";
     return roles;

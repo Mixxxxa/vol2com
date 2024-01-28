@@ -52,7 +52,7 @@ Settings::Settings(QObject *parent) :
     load();
 }
 
-Settings *Settings::create(QQmlEngine *, QJSEngine *engine)
+Settings *Settings::create(QQmlEngine *, [[maybe_unused]] QJSEngine *engine) // TODO check engine use
 {
   Settings *result = &(Settings::getInstance());
   QJSEngine::setObjectOwnership(result, QJSEngine::ObjectOwnership::CppOwnership);

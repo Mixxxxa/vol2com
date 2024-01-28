@@ -38,7 +38,7 @@ namespace vol2com
   public:
     static QString qmlDelegatesPath()
     {
-      return QStringLiteral("qrc:/vol2com/qml/");
+      return QStringLiteral("qrc:/qt/qml/vol2com/qml/");
     }
 
     explicit WorkModeBase(QObject* parent = nullptr):

@@ -29,15 +29,15 @@ using namespace vol2com;
 
 namespace
 {
-    static constexpr auto SectionEqualizer = "Equalizer";
-    static constexpr auto KeyEnabled = "Enabled";
-    static constexpr auto KeyOverall = "Overall";
-    static constexpr auto KeyBandPlaceholder = "Band%1";
-
-    bool checkValue(const Equalizer::EqualizerValue& input)
-    {
-        return (input >= Equalizer::MinimumValue) && (input <= Equalizer::MaximumValue);
-    }
+  static constexpr auto SectionEqualizer = "Equalizer";
+  static constexpr auto KeyEnabled = "Enabled";
+  static constexpr auto KeyOverall = "Overall";
+  static constexpr auto KeyBandPlaceholder = "Band%1";
+  
+  bool checkValue(const Equalizer::EqualizerValue& input)
+  {
+    return (input >= Equalizer::MinimumValue) && (input <= Equalizer::MaximumValue);
+  }
 }
 
 Equalizer::Equalizer(QObject *parent) :
@@ -46,110 +46,135 @@ Equalizer::Equalizer(QObject *parent) :
     m_values({}),
     m_enabled(true)
 {
-    setSaveTimeout(10000);
-    load();
+  using namespace std::chrono_literals;
+  setSaveTimeout(10s);
 }
 
 Equalizer::~Equalizer()
 {
-    save();
+  save();
 }
 
 const Equalizer::EqualizerValue& Equalizer::get(int band) const
 {
-    return m_values[band];
+  Q_ASSERT(band >= 0);
+  
+  using size_type = decltype(m_values)::size_type;
+  Q_ASSERT(static_cast<size_type>(band) < m_values.size());
+  
+  return m_values[static_cast<size_type>(band)];
 }
 
 void Equalizer::set(int band, const EqualizerValue& value)
 {
-    if((band < 0) || (static_cast<size_t>(band) > m_values.size())
-            || (checkValue(value) == false) || (value == m_values[band]))
-    {
-        return;
-    }
+  using size_type = decltype(m_values)::size_type;
+  const auto newBand = static_cast<size_type>(band);
 
-    m_values[band] = value;
-    emit valueChagned(band, m_values[band]);
-    scheduleSave();
+  if(    (band < 0)
+      || (newBand >= m_values.size())
+      || !checkValue(value)
+      || (value == m_values[newBand]))
+  {
+    return;
+  }
+  
+  m_values[newBand] = value;
+  emit valueChagned(band, m_values[newBand]);
+  scheduleSave();
 }
 
 const Equalizer::EqualizerValue& Equalizer::overallAmplification() const
 {
-    return m_overallAmplification;
+  return m_overallAmplification;
 }
 
 void Equalizer::setOverallAmplification(const EqualizerValue& value)
 {
-    if (m_overallAmplification == value)
-        return;
-
-    m_overallAmplification = value;
-    emit overallAmplificationChanged(m_overallAmplification);
+  if (m_overallAmplification == value)
+    return;
+  
+  m_overallAmplification = value;
+  emit overallAmplificationChanged(m_overallAmplification);
 }
 
 bool Equalizer::overallAmplificationActive() const
 {
-    return m_overallAmplification != DefaultValue;
+  return m_overallAmplification != DefaultValue;
 }
 
 const Equalizer::EqualizerData& Equalizer::all() const
 {
-    return m_values;
+  return m_values;
 }
 
 uint8_t Equalizer::processValue(int band, uint8_t value)
 {
-    if(!m_enabled)
-        return value;
-    else if((band < 0) || (static_cast<size_t>(band) > m_values.size()))
-        return static_cast<uint8_t>(0);
+  const auto selectedBand = static_cast<decltype(m_values)::size_type>(band);
+  if (  !m_enabled
+      || band < 0
+      || selectedBand >= m_values.size())
+  {
+    return value;
+  }
 
-    auto processedValue = (value * static_cast<unsigned>(m_overallAmplification) * static_cast<unsigned>(m_values[band])) / 10000;
-    if(processedValue > BassLibWrapper::MaxValue)
-        return BassLibWrapper::MaxValue;
-    else
-        return static_cast<uint8_t>(processedValue);
+  const auto processedValue = (  static_cast<unsigned>(value)
+                               * static_cast<unsigned>(m_overallAmplification)
+                               * static_cast<unsigned>(m_values[selectedBand])
+                              ) / 10000;
+  if(processedValue > BassLibWrapper::MaxValue)
+  {
+    return BassLibWrapper::MaxValue;
+  }
+  else
+  {
+    return static_cast<uint8_t>(processedValue);
+  }
 }
 
 void Equalizer::save()
 {
-    auto& settings = Settings::getInstance();
-
-    settings.set(QString(::SectionEqualizer), QString(::KeyEnabled), m_enabled);
-    settings.set(QString(::SectionEqualizer), QString(::KeyOverall), static_cast<int>(m_overallAmplification));
-    for(size_t i = 0; i < m_values.size(); ++i)
-    {
-        settings.set(QString(::SectionEqualizer), QString(::KeyBandPlaceholder).arg(i), static_cast<int>(m_values[i]));
-    }
+  auto& settings = Settings::getInstance();
+  
+  settings.set(QString(::SectionEqualizer), QString(::KeyEnabled), m_enabled);
+  settings.set(QString(::SectionEqualizer), QString(::KeyOverall), static_cast<int>(m_overallAmplification));
+  for(size_t i = 0; i < m_values.size(); ++i)
+  {
+    settings.set(QString(::SectionEqualizer), QString(::KeyBandPlaceholder).arg(i), static_cast<int>(m_values[i]));
+  }
 }
 
+/*!
+ * @brief Load settings
+ * @todo Rework
+ */
 void Equalizer::load()
 {
-    auto& settings = Settings::getInstance();
-
-    m_enabled = settings.get(QString(::SectionEqualizer), QString(::KeyEnabled), true).toBool();
-    m_overallAmplification = settings.getInt(QString(::SectionEqualizer),
-                                             QString(::KeyOverall),
-                                             MinimumValue, MaximumValue, DefaultValue);
-
-    for(size_t i = 0; i < m_values.size(); ++i)
-    {
-        m_values[i] = settings.getInt(QString(::SectionEqualizer),
-                                      QString(::KeyBandPlaceholder).arg(i),
-                                      MinimumValue, MaximumValue, DefaultValue);
-    }
+  auto& settings = Settings::getInstance();
+  
+  m_enabled = settings.get(QString(::SectionEqualizer), QString(::KeyEnabled), true).toBool();
+  // TODO Rework
+  m_overallAmplification = static_cast<unsigned>(settings.getInt(QString(::SectionEqualizer),
+                                                                 QString(::KeyOverall),
+                                                                 MinimumValue, MaximumValue, DefaultValue));
+  
+  for(size_t i = 0; i < m_values.size(); ++i)
+  {
+    m_values[i] = static_cast<unsigned>(settings.getInt(QString(::SectionEqualizer),
+                                                        QString(::KeyBandPlaceholder).arg(i),
+                                                        MinimumValue, MaximumValue, DefaultValue));
+  }
 }
 
 bool Equalizer::enabled() const
 {
-    return m_enabled;
+  return m_enabled;
 }
 
 void Equalizer::setEnabled(bool enabled)
 {
-    if(m_enabled == enabled)
-        return;
-
-    m_enabled = enabled;
-    emit enabledChanged(m_enabled);
+  if(m_enabled == enabled)
+    return;
+  
+  m_enabled = enabled;
+  emit enabledChanged(m_enabled);
 }

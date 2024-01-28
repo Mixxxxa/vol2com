@@ -27,6 +27,6 @@ namespace vol2com
   QString ConnectMethodBase::qmlDelegatesPath()
   {
     using namespace Qt::StringLiterals;
-    return u"qrc:/vol2com/qml/"_s;
+    return u"qrc:/qt/qml/vol2com/qml/"_s;
   }
 }

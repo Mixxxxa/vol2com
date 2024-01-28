@@ -44,7 +44,7 @@ namespace vol2com
         WorkModeWithSelector::ColorFunc colorFunc() const;
 
     protected:
-        QColor defaultColor(const uint8_t& value) const;
+        static QColor defaultColor(const uint8_t& value);
 
     protected slots:
         virtual void onTimer() override;

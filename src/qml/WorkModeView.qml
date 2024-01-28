@@ -97,7 +97,7 @@ Page {
     StackView {
         id: modeStack
         anchors.fill: parent
-        initialItem: "qrc:/vol2com/qml/WorkModeSelector.qml"
+        initialItem: "qrc:/qt/qml/vol2com/qml/WorkModeSelector.qml"
         Component.onCompleted: {
             if(viewModel.currentMode){
                 push(viewModel.currentMode.qmlDelegate, {}, StackView.Immediate)
