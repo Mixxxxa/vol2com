@@ -43,7 +43,6 @@
 #include "workmodes/generalmode.h"
 #include "workmodes/manualmode.h"
 #include "workmodes/fademode.h"
-#include "workmodes/christmasmode.h"
 #include "workmodes/randommode.h"
 
 #include <QDebug>
@@ -65,7 +64,6 @@ Controller::Controller(QObject *parent)
   m_factory->add<FadeMode>(u"Fade"_s,           tr("Fade"),      tr("Fading of selected color"),    u"qrc:/qt/qml/vol2com/res/modes/fade.svg"_s);
   m_factory->add<RandomMode>(u"Random"_s,       tr("Random"),    tr("Randomly changing colors"),    u"qrc:/qt/qml/vol2com/res/modes/random.svg"_s);
   m_factory->add<ManualMode>(u"Manual"_s,       tr("Manual"),    tr("Select any color"),            u"qrc:/qt/qml/vol2com/res/modes/manual.svg"_s);
-  m_factory->add<ChristmasMode>(u"Christmas"_s, tr("Christmas"), tr("Imitation of christmas leds"), u"qrc:/qt/qml/vol2com/res/modes/christmas.svg"_s);
 
   QObject::connect(connector().get(), &ConnectMethodBase::stateChanged,
                                 this, &Controller::onConnectionStateChanged);

@@ -33,7 +33,6 @@ qt_add_qml_module(appvol2com
         qml/main.qml
         qml/ConnectView.qml
         qml/SerialDelegate.qml
-        qml/ChristmasMode.qml
         qml/FadeMode.qml
         qml/GeneralMode.qml
         qml/ManualMode.qml
@@ -101,8 +100,6 @@ qt_add_qml_module(appvol2com
         v2c.h
         v2cbase.cpp
         v2cbase.h
-        workmodes/christmasmode.cpp
-        workmodes/christmasmode.h
         workmodes/fademode.cpp
         workmodes/fademode.h
         workmodes/generalmode.cpp
