@@ -92,6 +92,8 @@ if (MSVC)
                         /wd4625 # copy constructor was implicitly defined as deleted
                         /wd4626 # assignment operator was implicitly defined as deleted
                         /wd4702 # unreachable code (because can't suppress them on QtQml)
+                        /wd4710 # function not inlined
+                        /wd4711 # function selected for automatic inline expansion
                         /wd4820 # n bytes padding added after data member
                         /wd4866 # compiler may not enforce left-to-right evaluation order for call to
                         /wd5026 # move constructor was implicitly defined as deleted
