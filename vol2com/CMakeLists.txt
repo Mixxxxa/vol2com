@@ -1,32 +1,8 @@
 ﻿cmake_minimum_required(VERSION 3.22)
 
-qt_standard_project_setup(REQUIRES 6.5)
+qt_add_library(vol2com_lib STATIC)
 
-qt_add_executable(appvol2com
-    main.cpp
-    resource.rc
-)
-
-set_target_properties(appvol2com PROPERTIES
-    #MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appvol2com
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
-)
-
-target_link_libraries(appvol2com PRIVATE
-    Qt::Core
-    Qt::Gui
-    Qt::Quick
-    Qt::QuickControls2
-    Qt::SerialPort
-    Qt::Qml
-    bass_lib
-    basswasapi_lib
-)
-
-qt_add_qml_module(appvol2com
+qt_add_qml_module(vol2com_lib
     URI vol2com
     VERSION 1.0
     QML_FILES
@@ -133,11 +109,34 @@ qt_add_qml_module(appvol2com
         res/modes/random.svg
 )
 
-include(GNUInstallDirs)
-install(TARGETS appvol2com
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+target_link_libraries(vol2com_lib PRIVATE
+    Qt::Core
+    Qt::Gui
+    Qt::Quick
+    Qt::QuickControls2
+    Qt::QuickTemplates2
+    Qt::SerialPort
+    Qt::Qml
+    bass_lib
+    basswasapi_lib
+)
+
+target_compile_options(vol2com_lib PRIVATE
+    /Wall        # enable all errors
+    /WX          # treat all warnings as errors
+    /external:W0 # disable compiler warnings in external code
+    /wd4061 # enumerator in switch of enum is not explicitly handled by a case label
+    /wd4464 # relative include path contains '..' (because moc files)
+    /wd4625 # copy constructor was implicitly defined as deleted
+    /wd4626 # assignment operator was implicitly defined as deleted
+    /wd4702 # unreachable code (because can't suppress them on QtQml)
+    /wd4710 # function not inlined
+    /wd4711 # function selected for automatic inline expansion
+    /wd4820 # n bytes padding added after data member
+    /wd4866 # compiler may not enforce left-to-right evaluation order for call to
+    /wd5026 # move constructor was implicitly defined as deleted
+    /wd5027 # move assignment operator was implicitly defined as deleted
+    /wd5045 # compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
 )
 
 #qt_generate_deploy_qml_app_script(
@@ -145,15 +144,12 @@ install(TARGETS appvol2com
 #    FILENAME_VARIABLE deploy_script
 #)
 #install(SCRIPT ${deploy_script})
-install(FILES $<TARGET_PROPERTY:bass_lib,IMPORTED_LOCATION>
-              $<TARGET_PROPERTY:basswasapi_lib,IMPORTED_LOCATION>
-        DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
 
-target_compile_definitions(appvol2com PRIVATE
+target_compile_definitions(vol2com_lib PRIVATE
     NOMINMAX
 )
-target_include_directories(appvol2com PUBLIC
+
+target_include_directories(vol2com_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/viewmodels
     ${CMAKE_CURRENT_SOURCE_DIR}/gui
@@ -162,13 +158,3 @@ target_include_directories(appvol2com PUBLIC
     ${bass_SOURCE_DIR}/c
     ${bass_wasapi_SOURCE_DIR}/c
 )
-
-if (WIN32)
-    # Copy only bass and bass_wasapi dlls.
-    # Otherwise app is crashing on startup because not all Qt's libs copied by TARGET_RUNTIME_DLLS
-    add_custom_command(TARGET appvol2com POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_PROPERTY:basswasapi_lib,IMPORTED_LOCATION> $<TARGET_FILE_DIR:appvol2com>
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_PROPERTY:bass_lib,IMPORTED_LOCATION> $<TARGET_FILE_DIR:appvol2com>
-            COMMAND_EXPAND_LISTS
-    )
-endif()

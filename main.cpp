@@ -22,14 +22,17 @@
 **
 ****************************************************************************/
 
-#include "v2c.h"
 #include <QGuiApplication>
 #include <QQuickStyle>
 #include <QQmlApplicationEngine>
-#include "controller.h"
-
 #include <QLocale>
 #include <QTranslator>
+#include <QtQml/QQmlExtensionPlugin>
+
+#include "vol2com/v2c.h"
+#include "vol2com/controller.h"
+
+Q_IMPORT_QML_PLUGIN(vol2comPlugin)
 
 int main(int argc, char *argv[])
 {

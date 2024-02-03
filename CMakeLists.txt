@@ -78,27 +78,12 @@ find_package(${QtX} REQUIRED
 if (MSVC)
     add_compile_options(/Zi          # generate separate .pdb file
                         /nologo      # disable MSVC logo
-                        /Wall        # enable all errors
-                        /WX          # treat all warnings as errors
-                        /external:W0 # disable compiler warnings in external code
                         /permissive- # strict standards conformance
                         /GS          # enable buffer security check
                         /FC          # full path of source code file in diagnostics
                         /Zc:inline   # remove unreferenced functions or data
                         "$<$<CONFIG:DEBUG>:/Od>"
                         "$<$<CONFIG:RELEASE>:/O2>"
-                        /wd4061 # enumerator in switch of enum is not explicitly handled by a case label
-                        /wd4464 # relative include path contains '..' (because moc files)
-                        /wd4625 # copy constructor was implicitly defined as deleted
-                        /wd4626 # assignment operator was implicitly defined as deleted
-                        /wd4702 # unreachable code (because can't suppress them on QtQml)
-                        /wd4710 # function not inlined
-                        /wd4711 # function selected for automatic inline expansion
-                        /wd4820 # n bytes padding added after data member
-                        /wd4866 # compiler may not enforce left-to-right evaluation order for call to
-                        /wd5026 # move constructor was implicitly defined as deleted
-                        /wd5027 # move assignment operator was implicitly defined as deleted
-                        /wd5045 # compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
     )
     if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         add_compile_options(/MP
@@ -113,4 +98,51 @@ endif()
 ################################################################################
 # Targets setup
 ################################################################################
-add_subdirectory(src)
+qt_standard_project_setup(REQUIRES 6.5)
+
+add_subdirectory(vol2com)
+
+###########################################################################
+
+qt_add_executable(appvol2com
+    main.cpp
+    resource.rc
+)
+
+target_link_libraries(appvol2com PRIVATE
+    Qt::Core
+    Qt::Gui
+    Qt::Quick
+    Qt::QuickControls2
+    Qt::QuickTemplates2
+    Qt::SerialPort
+    Qt::Qml
+    vol2com_libplugin
+)
+
+set_target_properties(appvol2com PROPERTIES
+    #MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appvol2com
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+target_include_directories(appvol2com PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+if (WIN32)
+    # Copy only bass and bass_wasapi dlls.
+    # Otherwise app is crashing on startup because not all Qt's libs copied by TARGET_RUNTIME_DLLS
+    add_custom_command(TARGET appvol2com POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_PROPERTY:basswasapi_lib,IMPORTED_LOCATION> $<TARGET_FILE_DIR:appvol2com>
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_PROPERTY:bass_lib,IMPORTED_LOCATION> $<TARGET_FILE_DIR:appvol2com>
+            COMMAND_EXPAND_LISTS
+    )
+endif()
+
+install(FILES $<TARGET_PROPERTY:bass_lib,IMPORTED_LOCATION>
+              $<TARGET_PROPERTY:basswasapi_lib,IMPORTED_LOCATION>
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+)

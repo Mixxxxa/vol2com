@@ -1,7 +1,7 @@
-#include "v2c.h"
+#include "vol2com/v2c.h"
 #include <winver.h>
 
-IDI_ICON1 ICON "res/icon-active.ico"
+IDI_ICON1 ICON "vol2com/res/icon-active.ico"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     V2C_APP_VERSION
