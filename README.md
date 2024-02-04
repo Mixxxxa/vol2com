@@ -11,15 +11,15 @@ The main advantage of the program is the ability to control the color depended o
 - [Features](#features)
 - [Operating modes](#modes)
 - [How to build](#build)
-- [Planned features](#future)
+- [SAST Tools](#sast)
+- [Dependencies](#deps)
 
 <a name="features"></a>
 ## Features
-* Serial connection (Bluetooth via COM)
+* Serial connection
 * Various work modes
 * "Equalizer" for fine-tuning
 * Multi-language (at the moment English and Russian)
-* Notifications support (Windows 10+)
 
 <a name="modes"></a>
 ## Operating modes
@@ -27,23 +27,27 @@ The main advantage of the program is the ability to control the color depended o
 | ------------- |:-------------:| -----:|
 | General | Analyses sound and send color corresponding color | <img src=".github/General.png" width="300"> |
 | Fade | Blinks selected color to the beat of the music | <img src=".github/Fade.png" width="300"> |
-| Random | Smoothly changes current color in random direction | Nothing to see here) |
+| Random | Smoothly changes current color in random direction | Nothing to see here :) |
 | Manual | Sends selected color. HSV color selector available and a few predefined colors | <img src=".github/Manual.png" width="300"> |
 
 You can suggest new operating modes via [issues](https://github.com/Mixxxxa/vol2com/issues).
 
 <a name="build"></a>
 ## How to build and run
-Tested with Qt 5.15.2
+Tested with Qt 6.6.1
 1. Clone the repository
-2. Download and place dependencies in `/src/libs`
-3. Open vol2com.pro file and build
-4. Place `bass.dll` and `bass_wasapi.dll` (don't forget about bitness 32/64).
-5. Run builded exe
+2. Configure CMake project (it will automatically download and configure all dependencies)
+5. Build and run
 
-<a name="future"></a>
-## Planned features
-* Start at system startup
-* Ability to minimize to system tray and corresponding menu for the most frequency used functions.
-* Remote Control module - program will can perform various actions by request from the LED controller.
-* Support connection via WebSocket's
+<a name="sast"></a>
+## SAST Tools
+[PVS-Studio](https://pvs-studio.com/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.
+
+<a name="deps"></a>
+## Dependencies
+Thank you to the developers of these wonderful libraries:
+* [Qt](https://qt.io/)
+* [Bass](https://www.un4seen.com/)
+* [WinToast](https://github.com/mohabouje/WinToast/)
+
+
