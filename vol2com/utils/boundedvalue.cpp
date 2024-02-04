@@ -26,6 +26,19 @@
 #include <algorithm>
 #include <utility>
 
+namespace details
+{
+  template <typename T>
+  struct WiderType
+  { };
+
+  template <>
+  struct WiderType<int>
+  {
+    using type = int64_t;
+  };
+}
+
 namespace vol2com
 {
   BoundedValue::BoundedValue(value_type min, value_type max, value_type value,
@@ -119,20 +132,44 @@ namespace vol2com
 
     const auto oldValue = m_value;
 
-    if(m_overflowBehavior == EOverflowBehavior::Clamp)
+    if(InRange(value))
+    {
+      m_value = value;
+    }
+    else if(m_overflowBehavior == EOverflowBehavior::Clamp)
     {
       m_value = std::clamp(value, min(), max());
     }
     else if (m_overflowBehavior == EOverflowBehavior::Overflow)
     {
-      if(value >= 0)
+      using extended_type = details::WiderType<value_type>::type;
+
+      const auto extMin   = static_cast<extended_type>(min());
+      const auto extMax   = static_cast<extended_type>(max());
+      const auto extValue = static_cast<extended_type>(value);
+      const auto delta    = std::abs(extMax - extMin);
+
+      constexpr auto CalculateRemainder = [](extended_type overflow,
+                                             extended_type delta) -> extended_type
       {
-        m_value = value % (m_max + 1);
+        const extended_type turnoversCount = std::max(static_cast<extended_type>(1),
+                                                      overflow / delta);
+        return (overflow - turnoversCount) % (delta + 1);
+      };
+
+      if(extValue > extMax)
+      {
+        const extended_type exceed = std::abs(extValue - extMax);
+        const auto remainder = CalculateRemainder(exceed, delta);
+        m_value = static_cast<value_type>(extMin)
+                + static_cast<value_type>(remainder);
       }
       else
       {
-        const auto max = this->max();
-        m_value = max - std::abs(value) % (max + 1) + 1;
+        const extended_type exceed = std::abs(extValue - extMin);
+        const auto remainder = CalculateRemainder(exceed, delta);
+        m_value = static_cast<value_type>(extMax)
+                - static_cast<value_type>(remainder);
       }
     }
 
