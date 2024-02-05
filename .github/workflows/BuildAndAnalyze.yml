@@ -1,9 +1,9 @@
-name: Build Release
+name: Build and PVS-Studio analyze
 
-on: [workflow_dispatch]
+on: [push]
 
 env:
-  BUILD_TYPE: Release
+  BUILD_TYPE: Debug
   QT_VERSION: 6.6.1
   
 
@@ -15,8 +15,10 @@ jobs:
       matrix:
         config:
         - {
-            name: "Windows 2022 x64", artifact: "Windows-x64.zip",
+            name: "Windows 2022 x64", 
+            artifact: "Windows-x64.zip",
             os: windows-2022,
+            analyzer_path: "C:/Program Files (x86)/PVS-Studio",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
         #- {
@@ -34,7 +36,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v3.1.0
       with: 
-        version: '6.4.2'
+        version: '${{github.workspace}}'
         host: 'windows'
         target: 'desktop'
         arch: 'win64_msvc2019_64'
@@ -46,15 +48,14 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j
 
-    - name: Install
-      run: cmake --install ${{github.workspace}}/build
+    - name: Analyze
+      run: "${{ matrix.config.analyzer_path }}/CompilerCommandsAnalyzer.exe analyze -f build/compile_commands.json -j"
 
-    - name: Zip build
-      working-directory: ${{ runner.temp }}
-      run: 7z a ${{ matrix.config.artifact }} ${{github.workspace}}/build/output
+    - name: Convert PVS-Studio report
+      run: "${{ matrix.config.analyzer_path }}/HtmlGenerator.exe -t sarif -o pvs-report.sarif PVS-Studio.log"
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
+    - name: Publish report
+      uses: github/codeql-action/upload-sarif@v3
       with:
-        path: ${{ runner.temp }}/${{ matrix.config.artifact }}
-        name: ${{ matrix.config.artifact }}
+        sarif_file: pvs-report.sarif
+        category: PVS-Studio
