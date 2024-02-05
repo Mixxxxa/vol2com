@@ -48,6 +48,11 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j
 
+    - name: Choco install PVS-Studio
+      uses: crazy-max/ghaction-chocolatey@v3
+      with: 
+        args: install pvs-studio
+
     - name: Analyze
       run: "${{ matrix.config.analyzer_path }}/CompilerCommandsAnalyzer.exe analyze -f build/compile_commands.json -j"
 
