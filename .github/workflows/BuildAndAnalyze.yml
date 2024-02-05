@@ -31,7 +31,7 @@ jobs:
         #  }
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v3.1.0
@@ -54,10 +54,10 @@ jobs:
         args: install pvs-studio
 
     - name: Analyze
-      run: "${{ matrix.config.analyzer_path }}/CompilerCommandsAnalyzer.exe analyze -f build/compile_commands.json -j"
+      run: "\"${{ matrix.config.analyzer_path }}/CompilerCommandsAnalyzer.exe\" analyze -f build/compile_commands.json -j"
 
     - name: Convert PVS-Studio report
-      run: "${{ matrix.config.analyzer_path }}/HtmlGenerator.exe -t sarif -o pvs-report.sarif PVS-Studio.log"
+      run: "\"${{ matrix.config.analyzer_path }}/HtmlGenerator.exe\" -t sarif -o pvs-report.sarif PVS-Studio.log"
 
     - name: Publish report
       uses: github/codeql-action/upload-sarif@v3
