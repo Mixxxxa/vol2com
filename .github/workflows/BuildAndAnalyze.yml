@@ -18,8 +18,8 @@ jobs:
             name: "Windows 2022 x64", 
             artifact: "Windows-x64.zip",
             os: windows-latest,
-            analyzer_path: "C:/Program Files (x86)/PVS-Studio/CompilerCommandsAnalyzer.exe",
-            converter_path: "C:/Program Files (x86)/PVS-Studio/HtmlGenerator.exe",
+            analyzer_path: C:/Program Files (x86)/PVS-Studio/CompilerCommandsAnalyzer.exe,
+            converter_path: C:/Program Files (x86)/PVS-Studio/HtmlGenerator.exe,
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
         #- {
@@ -59,9 +59,9 @@ jobs:
           PVS_NAME: ${{ secrets.PVS_STUDIO_NAME }},
           PVS_KEY: ${{ secrets.PVS_STUDIO_KEY }}
       run: |
-        "\"${{ matrix.config.analyzer_path }} credentials $PVS_NAME $PVS_KEY -o PVS.lic\"" 
-        "\"${{ matrix.config.analyzer_path }} analyze -f build/compile_commands.json -l PVS.lic -o PVS-Studio.log --disableLicenseExpirationCheck -j\""
-        "\"${{ matrix.config.converter_path }} -a all -t sarif -o pvs-report.sarif PVS-Studio.log\""
+        ${{ matrix.config.analyzer_path }} credentials $PVS_NAME $PVS_KEY -o PVS.lic 
+        ${{ matrix.config.analyzer_path }} analyze -f build/compile_commands.json -l PVS.lic -o PVS-Studio.log --disableLicenseExpirationCheck -j
+        ${{ matrix.config.converter_path }} -a all -t sarif -o pvs-report.sarif PVS-Studio.log
 
     - name: Publish static analysis report
       uses: github/codeql-action/upload-sarif@v3
