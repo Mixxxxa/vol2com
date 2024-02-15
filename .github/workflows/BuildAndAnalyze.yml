@@ -17,8 +17,9 @@ jobs:
         - {
             name: "Windows 2022 x64", 
             artifact: "Windows-x64.zip",
-            os: windows-2022,
-            analyzer_path: "C:/Program Files (x86)/PVS-Studio",
+            os: windows-latest,
+            analyzer_path: "C:/Program Files (x86)/PVS-Studio/CompilerCommandsAnalyzer.exe",
+            converter_path: "C:/Program Files (x86)/PVS-Studio/HtmlGenerator.exe",
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
         #- {
@@ -43,23 +44,26 @@ jobs:
         modules: 'qtserialport'
 
     - name: Configure
-      run: cmake -S . -B ${{github.workspace}}/build "-GVisual Studio 17 2022" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} "-DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/output"
+      run: cmake -S . -B ${{github.workspace}}/build "-GVisual Studio 17 2022" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=On "-DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/output"
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j -- /m
 
     - name: Choco install PVS-Studio
       uses: crazy-max/ghaction-chocolatey@v3
       with: 
         args: install pvs-studio
 
-    - name: Analyze
-      run: "\"${{ matrix.config.analyzer_path }}/CompilerCommandsAnalyzer.exe analyze -f build/compile_commands.json -j\""
+    - name: Static analysis
+      env:
+          PVS_NAME: ${{ secrets.PVS_STUDIO_NAME }},
+          PVS_KEY: ${{ secrets.PVS_STUDIO_KEY }}
+      run: |
+        "\"${{ matrix.config.analyzer_path }} credentials $PVS_NAME $PVS_KEY -o PVS.lic\"" 
+        "\"${{ matrix.config.analyzer_path }} analyze -f build/compile_commands.json -l PVS.lic -o PVS-Studio.log --disableLicenseExpirationCheck -j\""
+        "\"${{ matrix.config.converter_path }} -a all -t sarif -o pvs-report.sarif PVS-Studio.log\""
 
-    - name: Convert PVS-Studio report
-      run: "\"${{ matrix.config.analyzer_path }}/HtmlGenerator.exe -t sarif -o pvs-report.sarif PVS-Studio.log\""
-
-    - name: Publish report
+    - name: Publish static analysis report
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: pvs-report.sarif
