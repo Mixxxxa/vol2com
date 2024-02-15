@@ -18,9 +18,9 @@ jobs:
             name: "Windows 2022 x64", 
             artifact: "Windows-x64.zip",
             os: windows-latest,
-            analyzer_path: C:/Program Files (x86)/PVS-Studio/CompilerCommandsAnalyzer.exe,
-            converter_path: C:/Program Files (x86)/PVS-Studio/HtmlGenerator.exe,
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+            analyzer_path: $ProgramFiles(x86)/PVS-Studio/CompilerCommandsAnalyzer.exe,
+            converter_path: $ProgramFiles(x86)/PVS-Studio/HtmlGenerator.exe,
+            environment_script: "$ProgramFiles(x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
         #- {
         #    name: "Linux Latest x64", artifact: "Linux-x64.zip",
