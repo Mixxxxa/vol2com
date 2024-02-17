@@ -49,6 +49,9 @@ jobs:
       with: 
         args: install pvs-studio ninja
 
+    - name: Initialize MSVC development environment
+      uses: ilammy/msvc-dev-cmd@v1.13.0
+
     - name: Configure
       run: cmake -S . -B ${{github.workspace}}/build "-GNinja" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=On "-DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/output"
 
