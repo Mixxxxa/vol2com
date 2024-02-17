@@ -19,8 +19,6 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
 # Includes
 ################################################################################
 include(FetchContent)
-include(cmake/gitinfo.cmake)
-include(cmake/pvs-extra-exclude-paths.cmake)
 
 ################################################################################
 # Libraries
@@ -149,3 +147,9 @@ install(FILES $<TARGET_PROPERTY:bass_lib,IMPORTED_LOCATION>
               $<TARGET_PROPERTY:basswasapi_lib,IMPORTED_LOCATION>
         DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+################################################################################
+# Other
+################################################################################
+include(cmake/gitinfo.cmake)
+include(cmake/pvs-extra-exclude-paths.cmake)
