@@ -58,10 +58,11 @@ jobs:
       env:
           PVS_NAME: ${{ secrets.PVS_STUDIO_NAME }},
           PVS_KEY: ${{ secrets.PVS_STUDIO_KEY }}
+      shell: pwsh
       run: |
-        "${{ matrix.config.analyzer_path }} credentials $PVS_NAME $PVS_KEY -o PVS.lic "
-        "${{ matrix.config.analyzer_path }} analyze -f build/compile_commands.json -l PVS.lic -o PVS-Studio.log --disableLicenseExpirationCheck -j"
-        "${{ matrix.config.converter_path }} -a all -t sarif -o pvs-report.sarif PVS-Studio.log"
+        "& ${{ matrix.config.analyzer_path }} credentials $PVS_NAME $PVS_KEY -o PVS.lic"
+        "& ${{ matrix.config.analyzer_path }} analyze -f build/compile_commands.json -l PVS.lic -o PVS-Studio.log --disableLicenseExpirationCheck -j"
+        "& ${{ matrix.config.converter_path }} -a all -t sarif -o pvs-report.sarif PVS-Studio.log"
 
     - name: Publish static analysis report
       uses: github/codeql-action/upload-sarif@v3
