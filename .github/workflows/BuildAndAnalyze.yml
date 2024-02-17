@@ -11,6 +11,7 @@ jobs:
   build:
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 20
     strategy:
       matrix:
         config:
@@ -60,9 +61,9 @@ jobs:
           PVS_KEY: ${{ secrets.PVS_STUDIO_KEY }}
       shell: pwsh
       run: |
-        "& ${{ matrix.config.analyzer_path }} credentials $PVS_NAME $PVS_KEY -o PVS.lic"
-        "& ${{ matrix.config.analyzer_path }} analyze -f build/compile_commands.json -l PVS.lic -o PVS-Studio.log --disableLicenseExpirationCheck -j"
-        "& ${{ matrix.config.converter_path }} -a all -t sarif -o pvs-report.sarif PVS-Studio.log"
+        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "credentials", "$PVS_NAME", "$PVS_KEY", "-o", "PVS.lic"
+        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "analyze", "-f", "build/compile_commands.json", "-l", "PVS.lic", "-o", "PVS-Studio.log", "--disableLicenseExpirationCheck", "-j" 
+        Start-Process -FilePath "${{ matrix.config.converter_path }}" -NoNewWindow -Wait -ArgumentList "-a", "all", "-t", "sarif", "-o", "pvs-report.sarif", "PVS-Studio.log"
 
     - name: Publish static analysis report
       uses: github/codeql-action/upload-sarif@v3
