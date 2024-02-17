@@ -60,7 +60,7 @@ jobs:
 
     - name: Static analysis
       env:
-          PVS_NAME: ${{ secrets.PVS_STUDIO_NAME }},
+          PVS_NAME: ${{ secrets.PVS_STUDIO_NAME }}
           PVS_KEY: ${{ secrets.PVS_STUDIO_KEY }}
       shell: pwsh
       run: |
