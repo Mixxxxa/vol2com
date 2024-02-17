@@ -5,7 +5,6 @@ on: [push]
 env:
   BUILD_TYPE: Debug
   QT_VERSION: 6.6.1
-  
 
 jobs:
   build:
@@ -20,8 +19,7 @@ jobs:
             artifact: "Windows-x64.zip",
             os: windows-latest,
             analyzer_path: "C:/Program Files (x86)/PVS-Studio/CompilerCommandsAnalyzer.exe",
-            converter_path: "C:/Program Files (x86)/PVS-Studio/HtmlGenerator.exe",
-            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+            converter_path: "C:/Program Files (x86)/PVS-Studio/HtmlGenerator.exe"
           }
         #- {
         #    name: "Linux Latest x64", artifact: "Linux-x64.zip",
@@ -50,7 +48,7 @@ jobs:
         args: install pvs-studio ninja
 
     - name: Initialize MSVC development environment
-      uses: ilammy/msvc-dev-cmd@v1.13.0
+      uses: ilammy/msvc-dev-cmd@v1
 
     - name: Configure
       run: cmake -S . -B ${{github.workspace}}/build "-GNinja" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=On "-DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/output"
@@ -65,7 +63,7 @@ jobs:
       shell: pwsh
       run: |
         Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "credentials", "$env:PVS_NAME", "$env:PVS_KEY", "-o", "PVS.lic"
-        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "analyze", "-f", "${{github.workspace}}/build/compile_commands.json", "-l", "PVS.lic", "-o", "PVS-Studio.log", "--disableLicenseExpirationCheck", "-j" 
+        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "analyze", "-f", "${{github.workspace}}/build/compile_commands.json", "-R", "${{github.workspace}}/.PVS-Studio/analyze.pvsconfig", "-l", "PVS.lic", "-o", "PVS-Studio.log", "-j" 
         Start-Process -FilePath "${{ matrix.config.converter_path }}" -NoNewWindow -Wait -ArgumentList "-a", "all", "-t", "sarif", "-o", "pvs-report.sarif", "PVS-Studio.log"
 
     - name: Publish static analysis report
