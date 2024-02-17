@@ -6,6 +6,4 @@
 //-V::AUTOSAR
 //-V::OWASP
 # Excluded paths
-//V_EXCLUDE_PATH */_deps/*
-//V_EXCLUDE_PATH */.rcc/*
 //V_EXCLUDE_PATH mocs_*.cpp

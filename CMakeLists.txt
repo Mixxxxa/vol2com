@@ -20,6 +20,7 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
 ################################################################################
 include(FetchContent)
 include(cmake/gitinfo.cmake)
+include(cmake/pvs-extra-exclude-paths.cmake)
 
 ################################################################################
 # Libraries

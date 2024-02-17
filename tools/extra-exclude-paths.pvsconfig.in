@@ -1,0 +1,4 @@
+# Build path with all deps
+//V_EXCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}
+# Qt includes directory
+//V_EXCLUDE_PATH ${PVS_QT_DIR_TO_EXCLUDE}
