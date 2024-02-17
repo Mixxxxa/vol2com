@@ -44,16 +44,16 @@ jobs:
         arch: 'win64_msvc2019_64'
         modules: 'qtserialport'
 
-    - name: Configure
-      run: cmake -S . -B ${{github.workspace}}/build "-GVisual Studio 17 2022" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=On "-DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/output"
-
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j -- /m
-
-    - name: Choco install PVS-Studio
+    - name: Choco install tools
       uses: crazy-max/ghaction-chocolatey@v3
       with: 
-        args: install pvs-studio
+        args: install pvs-studio ninja
+
+    - name: Configure
+      run: cmake -S . -B ${{github.workspace}}/build "-GNinja" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=On "-DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/output"
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Static analysis
       env:
@@ -61,8 +61,8 @@ jobs:
           PVS_KEY: ${{ secrets.PVS_STUDIO_KEY }}
       shell: pwsh
       run: |
-        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "credentials", "$PVS_NAME", "$PVS_KEY", "-o", "PVS.lic"
-        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "analyze", "-f", "build/compile_commands.json", "-l", "PVS.lic", "-o", "PVS-Studio.log", "--disableLicenseExpirationCheck", "-j" 
+        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "credentials", "$env:PVS_NAME", "$env:PVS_KEY", "-o", "PVS.lic"
+        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "analyze", "-f", "${{github.workspace}}/build/compile_commands.json", "-l", "PVS.lic", "-o", "PVS-Studio.log", "--disableLicenseExpirationCheck", "-j" 
         Start-Process -FilePath "${{ matrix.config.converter_path }}" -NoNewWindow -Wait -ArgumentList "-a", "all", "-t", "sarif", "-o", "pvs-report.sarif", "PVS-Studio.log"
 
     - name: Publish static analysis report
