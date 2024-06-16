@@ -64,6 +64,7 @@ set(QtX Qt${QT_VERSION_MAJOR})
 find_package(${QtX} REQUIRED
                     COMPONENTS
                         Gui
+                        Widgets
                         Quick
                         Qml
                         QuickControls2
@@ -113,6 +114,7 @@ qt_add_executable(appvol2com
 target_link_libraries(appvol2com PRIVATE
     Qt::Core
     Qt::Gui
+    Qt::Widgets
     Qt::Quick
     Qt::QuickControls2
     Qt::QuickTemplates2

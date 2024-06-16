@@ -11,6 +11,7 @@ qt_add_qml_module(vol2com_lib
         qml/SerialDelegate.qml
         qml/FadeMode.qml
         qml/GeneralMode.qml
+        qml/AiMode.qml
         qml/ManualMode.qml
         qml/WorkModeSelector.qml
         qml/WorkModeView.qml
@@ -33,6 +34,8 @@ qt_add_qml_module(vol2com_lib
     SOURCES
         appstyle.cpp
         appstyle.h
+        traymenu.h
+        traymenu.cpp
         connectmethodbase.h connectmethodbase.cpp
         controller.cpp
         controller.h
@@ -80,12 +83,16 @@ qt_add_qml_module(vol2com_lib
         workmodes/fademode.h
         workmodes/generalmode.cpp
         workmodes/generalmode.h
+        workmodes/aimode.cpp
+        workmodes/aimode.h
         workmodes/manualmode.cpp
         workmodes/manualmode.h
         workmodes/randommode.cpp
         workmodes/randommode.h
         workmodes/workmodewithselector.cpp
         workmodes/workmodewithselector.h
+        workmodes/genredetector.h
+        workmodes/genredetector.cpp
         workmodesfactory.cpp
         workmodesfactory.h
 
@@ -107,10 +114,12 @@ qt_add_qml_module(vol2com_lib
         res/modes/manual.svg
         res/modes/party.svg
         res/modes/random.svg
+        res/modes/ai.svg
 )
 
 target_link_libraries(vol2com_lib PRIVATE
     Qt::Core
+    Qt::Widgets
     Qt::Gui
     Qt::Quick
     Qt::QuickControls2

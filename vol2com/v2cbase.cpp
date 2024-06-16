@@ -37,7 +37,7 @@ namespace vol2com
     m_saveTimer->setSingleShot(true);
     m_saveTimer->setTimerType(Qt::VeryCoarseTimer);
     QObject::connect(m_saveTimer, &QTimer::timeout,
-                     this, &V2CBase::save);
+                            this, &V2CBase::save);
   }
 
   void V2CBase::scheduleSave()

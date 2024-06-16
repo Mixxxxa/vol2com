@@ -22,7 +22,7 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQuickStyle>
 #include <QQmlApplicationEngine>
 #include <QLocale>
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   QCoreApplication::setApplicationVersion(V2C_APP_VERSION_STR);
 
   QQuickStyle::setStyle(QLatin1String("Universal"));
-  QGuiApplication app(argc, argv);
+  QApplication app(argc, argv);
 
   QTranslator translator;
   const QStringList uiLanguages = QLocale::system().uiLanguages();

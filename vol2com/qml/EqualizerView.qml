@@ -59,8 +59,10 @@ Page {
         enabled: viewModel.enabled
         ListDelegate {
             text: qsTr("Overall amplification:")
+            Layout.fillWidth: true
             Slider {
                 Layout.fillWidth: true
+                Layout.preferredWidth: 200
                 from: viewModel.minValue
                 to: viewModel.maxValue
                 stepSize: 10
@@ -93,6 +95,7 @@ Page {
         }
         ListDelegate {
             text: qsTr("Band #") + viewModel.selectedBand
+            Layout.fillWidth: true
             Slider {
                 Layout.fillWidth: true
                 from: viewModel.minValue

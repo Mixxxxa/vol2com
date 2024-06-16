@@ -40,6 +40,7 @@ namespace vol2com
   //class WorkModesModel;
   class WorkModesFactory;
   class WorkModeBase;
+  class TrayMenu;
   //class SystemEvents;
 
   class Controller : public V2CBase
@@ -91,6 +92,7 @@ namespace vol2com
     void openUI();
     void closeUI();
     void exit();
+    void RequestExit();
 
     void openGUIPage(const vol2com::Controller::Page& page);
     void retryConnect();
@@ -125,6 +127,8 @@ namespace vol2com
     std::shared_ptr<WorkModesFactory> m_factory;
     std::shared_ptr<WorkModeBase> m_mode;
     std::unique_ptr<QQmlApplicationEngine> m_engine;
+
+    std::unique_ptr<TrayMenu> m_tray;
     //std::unique_ptr<SystemEvents> m_systemEvents;
   };
 }

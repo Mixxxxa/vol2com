@@ -37,7 +37,7 @@ namespace vol2com
 
   public:
     explicit V2CBase(QObject *parent = nullptr);
-    virtual ~V2CBase() = default;
+    //virtual ~V2CBase() = default;
 
     std::chrono::milliseconds saveTimeout() const;
     void setSaveTimeout(std::chrono::milliseconds timeout);
@@ -50,5 +50,14 @@ namespace vol2com
   private:
     QTimer* m_saveTimer;
     std::chrono::milliseconds m_saveTimeout;
+  };
+
+  struct V2CBaseDeleter
+  {
+    void operator()(V2CBase *obj) const
+    {
+      obj->save();
+      delete obj;
+    }
   };
 }
