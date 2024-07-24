@@ -1,73 +1,109 @@
 name: Build and PVS-Studio analyze
 
-on: [push]
+on: 
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 env:
   BUILD_TYPE: Debug
   QT_VERSION: 6.6.1
+  PARALLEL_COUNT: 4
 
 jobs:
   build:
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
+    permissions:
+      contents: read         # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read          # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
     timeout-minutes: 20
     strategy:
+      fail-fast: true
       matrix:
         config:
         - {
-            name: "Windows 2022 x64", 
+            name: "Windows x64", 
             artifact: "Windows-x64.zip",
-            os: windows-latest,
-            analyzer_path: "C:/Program Files (x86)/PVS-Studio/CompilerCommandsAnalyzer.exe",
-            converter_path: "C:/Program Files (x86)/PVS-Studio/HtmlGenerator.exe"
+            os: windows-latest
           }
         #- {
         #    name: "Linux Latest x64", artifact: "Linux-x64.zip",
         #    os: ubuntu-latest
-        #  }
-        #- {
-        #    name: "macOS Latest x64", artifact: "macOS-x64.zip",
-        #    os: macos-latest
         #  }
 
     steps:
     - uses: actions/checkout@v4
 
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3.1.0
+      uses: jurplel/install-qt-action@v4.0.0
       with: 
         version: '${{env.QT_VERSION}}'
-        host: 'windows'
         target: 'desktop'
         arch: 'win64_msvc2019_64'
         modules: 'qtserialport'
 
-    - name: Choco install tools
-      uses: crazy-max/ghaction-chocolatey@v3
-      with: 
-        args: install pvs-studio ninja
+    - name: Install dev tools
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt update
+          sudo apt install ninja-build
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+          choco install ninja
+        else
+          echo "$RUNNER_OS is not supported"
+          exit 1
+        fi
+      shell: bash
 
     - name: Initialize MSVC development environment
+      if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Configure
-      run: cmake -S . -B ${{github.workspace}}/build "-GNinja" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_EXPORT_COMPILE_COMMANDS=On "-DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/output"
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "compile-db-filepath=${{ github.workspace }}/build/compile_commands.json" >> "$GITHUB_OUTPUT"
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -GNinja
+        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/output
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=On
+        -S ${{ github.workspace }}
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{env.BUILD_TYPE}}
 
-    - name: Static analysis
+    - name: Analyze with PVS-Studio
+      id: pvs-analysis
+      uses: Mixxxxa/pvsstudiopipeline/cpp-analysis@dev
       env:
-          PVS_NAME: ${{ secrets.PVS_STUDIO_NAME }}
-          PVS_KEY: ${{ secrets.PVS_STUDIO_KEY }}
-      shell: pwsh
-      run: |
-        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "credentials", "$env:PVS_NAME", "$env:PVS_KEY", "-o", "PVS.lic"
-        Start-Process -FilePath "${{ matrix.config.analyzer_path }}" -NoNewWindow -Wait -ArgumentList "analyze", "-f", "${{github.workspace}}/build/compile_commands.json", "-R", "${{github.workspace}}/.PVS-Studio/analyze.pvsconfig", "-l", "PVS.lic", "-o", "PVS-Studio.log", "-j" 
-        Start-Process -FilePath "${{ matrix.config.converter_path }}" -NoNewWindow -Wait -ArgumentList "-a", "all", "-t", "sarif", "-o", "pvs-report.sarif", "PVS-Studio.log"
+        PVS_STUDIO_LICENSE_NAME: ${{secrets.PVS_STUDIO_NAME}}
+        PVS_STUDIO_LICENSE_KEY: ${{secrets.PVS_STUDIO_KEY}}
+      with:
+        file-to-analyze: ${{ steps.strings.outputs.compile-db-filepath }}
+        analysis-mode: GA;OP
+        parallel: ${{env.PARALLEL_COUNT}}
+        rules-configs: |
+          ${{ github.workspace }}/.PVS-Studio/analyze.pvsconfig
+          ${{ github.workspace }}/.PVS-Studio/extra-exclude-paths.pvsconfig
 
-    - name: Publish static analysis report
+    - name: Convert report (JSON)
+      id: pvs-convert-sarif
+      uses: Mixxxxa/pvsstudiopipeline/convert-report@dev
+      with:
+        input-files: ${{ steps.pvs-analysis.outputs.raw-report }}
+        output-format: 'sarif'
+        output-file: ${{ steps.strings.outputs.build-output-dir }}/pvs-report.sarif
+
+    - name: Upload static analysis report
       uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: pvs-report.sarif
+        sarif_file: ${{ steps.pvs-convert-sarif.outputs.report }}
         category: PVS-Studio
