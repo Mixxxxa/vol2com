@@ -102,8 +102,11 @@ jobs:
           ${{ github.workspace }}/.PVS-Studio/analyze.pvsconfig
           ${{ github.workspace }}/.PVS-Studio/extra-exclude-paths.pvsconfig
         additional-args: |
-          --dump-log ${{ steps.strings.outputs.debug-log-filepath }}
-          || exit 0
+          --dump-log
+          ${{ steps.strings.outputs.debug-log-filepath }}
+          ||
+          exit
+          0
 
     - name: Upload another debug artifacts
       uses: actions/upload-artifact@v4
