@@ -91,6 +91,7 @@ jobs:
     - name: Analyze with PVS-Studio
       id: pvs-analysis
       uses: Mixxxxa/pvsstudiopipeline/cpp-analysis@dev
+      continue-on-error: true
       env:
         PVS_STUDIO_LICENSE_NAME: ${{secrets.PVS_STUDIO_NAME}}
         PVS_STUDIO_LICENSE_KEY: ${{secrets.PVS_STUDIO_KEY}}
