@@ -67,6 +67,7 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         echo "compile-db-filepath=${{ github.workspace }}/build/compile_commands.json" >> "$GITHUB_OUTPUT"
+        echo "debug-log-filepath=${{ github.workspace }}/build/analysis-debug.log" >> "$GITHUB_OUTPUT"
 
     - name: Configure CMake
       run: >
@@ -86,7 +87,6 @@ jobs:
         name: 'pvs-${{ runner.os }}'
         path: |
           ${{ steps.strings.outputs.compile-db-filepath }}
-          
 
     - name: Analyze with PVS-Studio
       id: pvs-analysis
@@ -101,6 +101,16 @@ jobs:
         rules-configs: |
           ${{ github.workspace }}/.PVS-Studio/analyze.pvsconfig
           ${{ github.workspace }}/.PVS-Studio/extra-exclude-paths.pvsconfig
+        additional-args: |
+          --dump-log ${{ steps.strings.outputs.debug-log-filepath }}
+          || exit 0
+
+    - name: Upload another debug artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: 'pvs-${{ runner.os }}-second'
+        path: |
+          ${{ steps.strings.outputs.debug-log-filepath }}
 
     - name: Convert report (JSON)
       id: pvs-convert-sarif
