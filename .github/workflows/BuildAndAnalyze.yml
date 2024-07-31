@@ -80,6 +80,14 @@ jobs:
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{env.BUILD_TYPE}}
 
+    - name: Upload debug artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: 'pvs-${{ runner.os }}'
+        path: |
+          ${{ steps.strings.outputs.compile-db-filepath }}
+          
+
     - name: Analyze with PVS-Studio
       id: pvs-analysis
       uses: Mixxxxa/pvsstudiopipeline/cpp-analysis@dev
